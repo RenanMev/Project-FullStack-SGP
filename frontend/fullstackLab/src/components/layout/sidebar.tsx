@@ -16,7 +16,7 @@ const Sidebar: React.FC = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="flex flex-col fixed gap-0 h-screen bg-neutral-950 w-60">
+    <div className="flex flex-col fixed gap-0 h-screen bg-neutral-950 w-60 border-r-2 border-neutral-800">
       <div className='flex items-center px-4 w-full my-4 justify-around'>
 
         <Avatar className='rounded-full pointer'>
@@ -31,16 +31,8 @@ const Sidebar: React.FC = () => {
       <div className='flex flex-col h-full py-6'>
         <nav className="flex-col flex h-full items-start px-2 text-sm font-medium lg:px-4  gap-3">
           <Link
-            to="/dashboard"
-            className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${isActive('/dashboard') ? 'bg-muted text-primary' : 'text-muted-foreground'
-              }`}
-          >
-            <SquareKanban className=" h-6 w-6" />
-            Dashboard
-          </Link>
-          <Link
-            to="/listprojects"
-            className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${isActive('/orders') ? 'bg-muted text-primary' : 'text-muted-foreground'
+            to="/projects"
+            className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${isActive('/projects') ? 'bg-muted text-primary' : 'text-muted-foreground'
               }`}
           >
             <ChartNoAxesGantt className=" h-6 w-6" />
