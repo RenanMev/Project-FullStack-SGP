@@ -32,7 +32,7 @@ const EditUserDialog: React.FC = () => {
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <Button onClick={toggleDialog} className="bg-violet-700 rounded-full pt-1">
+          <Button onClick={toggleDialog} className=" rounded-full pt-1">
             <Settings2 className="h-4 w-4" />
           </Button>
         </DialogTrigger>
@@ -63,7 +63,7 @@ const EditUserDialog: React.FC = () => {
           </div>
 
           <DialogFooter>
-            <Button onClick={handleSave} className={`bg-violet-700 text-white ${darkMode ? 'bg-violet-700 text-white' : 'bg-violet-500 text-black'}`}>
+            <Button onClick={handleSave} className={`bg-violet-700 text-white ${darkMode ? 'bg-neutral-900 hover:bg-neutral-50 text-white hover:text-black' : 'bg-violet-500 text-black'}`}>
               Salvar
             </Button>
             <Button variant="outline" onClick={toggleDialog} className={`border-neutral-800 text-white ${darkMode ? 'border-neutral-800 text-black hover:text-white hover:bg-neutral-950' : 'border-neutral-300 text-black'}`}>

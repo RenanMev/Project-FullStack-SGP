@@ -1,17 +1,16 @@
-// src/components/layout/ProtectedLayout.tsx
 import Sidebar from '@/components/layout/sidebar';
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 
 const ProtectedLayout: React.FC = () => {
   return (
-    <div style={{ display: 'flex' }}>
+    <div >
       <Sidebar />
-      <main className='pl-60 flex-1'>
+      <main className='flex-1 ml-60'>
         <Outlet />
       </main>
     </div>
   );
 };
 
-export default ProtectedLayout;
+export default ProtectedLayout; 

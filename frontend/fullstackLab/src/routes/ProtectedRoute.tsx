@@ -5,9 +5,10 @@ import { Navigate, Outlet } from 'react-router-dom';
 const ProtectedRoute: React.FC = () => {
   const authenticated = isAuthenticated();
 
-  if (!authenticated) {
-    return <Navigate to="/" replace />;
-  }
+  // if (!authenticated) {
+  //   return <Navigate to="/" replace />;
+  // }
+  
 
   return <Outlet />;
 };
