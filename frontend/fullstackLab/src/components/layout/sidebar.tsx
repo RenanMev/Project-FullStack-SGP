@@ -1,0 +1,76 @@
+import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import {
+  SquareKanban,
+  CircleFadingPlus,
+  ChartNoAxesGantt,
+  Users,
+} from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
+import { Button } from '../ui/button';
+import EditUserDialog from '../ui/SettingsDialog';
+
+const Sidebar: React.FC = () => {
+  const location = useLocation();
+
+  const isActive = (path: string) => location.pathname === path;
+
+  return (
+    <div className="flex flex-col fixed gap-0 h-screen bg-neutral-950 w-60">
+      <div className='flex items-center px-4 w-full my-4 justify-around'>
+
+        <Avatar className='rounded-full pointer'>
+          <AvatarImage className='rounded-full w-10 cursor-pointer hover:border-2 border-white ' src="https://github.com/shadcn.png" alt="@shadcn" />
+          <AvatarFallback>CN</AvatarFallback>
+        </Avatar>
+        <div className='text-neutral-50 font-medium'>
+          Renan Mev
+        </div>
+        <EditUserDialog />
+      </div>
+      <div className='flex flex-col h-full py-6'>
+        <nav className="flex-col flex h-full items-start px-2 text-sm font-medium lg:px-4  gap-3">
+          <Link
+            to="/dashboard"
+            className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${isActive('/dashboard') ? 'bg-muted text-primary' : 'text-muted-foreground'
+              }`}
+          >
+            <SquareKanban className=" h-6 w-6" />
+            Dashboard
+          </Link>
+          <Link
+            to="/listprojects"
+            className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${isActive('/orders') ? 'bg-muted text-primary' : 'text-muted-foreground'
+              }`}
+          >
+            <ChartNoAxesGantt className=" h-6 w-6" />
+            Projetos
+          </Link>
+          <Link
+            to="/products"
+            className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${isActive('/products') ? 'bg-muted text-primary' : 'text-muted-foreground'
+              }`}
+          >
+            <CircleFadingPlus className=" h-6 w-6" />
+            Criar Projeto
+          </Link>
+          <Link
+            to="/customers"
+            className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${isActive('/customers') ? 'bg-muted text-primary' : 'text-muted-foreground'
+              }`}
+          >
+            <Users className=" h-6 w-6" />
+            Colaboradores
+          </Link>
+        </nav>
+        <div className='px-4'>
+          <Button className='w-full'>
+            Sair
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Sidebar;
