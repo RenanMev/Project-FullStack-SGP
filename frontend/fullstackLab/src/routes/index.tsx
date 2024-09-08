@@ -6,6 +6,8 @@ import ProtectedRoute from '@/routes/ProtectedRoute';
 import ProtectedLayout from './ProtectedLayout';
 import NotFound from '@/pages/notFound';
 import ProjectsList from '@/pages/Projects/ProjectsPage';
+import CreateProjects from '@/pages/CreateProjects/CreateProjects';
+import Collaborators from '@/pages/Collaborators/Collaborators';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -16,6 +18,8 @@ const AppRoutes: React.FC = () => {
         <Route element={<ProtectedRoute />}>
           <Route element={<ProtectedLayout />}>
             <Route path="/projects" element={<ProjectsList />} />
+            <Route path="/createProjects" element={<CreateProjects />} />
+            <Route path="/collaborators" element={<Collaborators />} />
           </Route>
         </Route>
         <Route path="*" element={<NotFound />} />

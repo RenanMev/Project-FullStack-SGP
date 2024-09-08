@@ -24,7 +24,7 @@ const ProjectsList: React.FC = () => {
               você consegue verificar todos os projetos que forám criados
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className='w-full overflow-x-auto'>
             <CardProjects />
           </CardContent>
         </Card>

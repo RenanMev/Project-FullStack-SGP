@@ -1,19 +1,30 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import {
   SquareKanban,
   CircleFadingPlus,
   ChartNoAxesGantt,
   Users,
+  Terminal,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
 import { Button } from '../ui/button';
 import EditUserDialog from '../ui/SettingsDialog';
+import { LogoutIsAcout } from '@/services/utils/auth';
+import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
+
 
 const Sidebar: React.FC = () => {
+  const navigate = useNavigate();
   const location = useLocation();
-
   const isActive = (path: string) => location.pathname === path;
+
+  const handleLogout = () => {
+    LogoutIsAcout();
+    navigate('/');
+  }
+
+
 
   return (
     <div className="flex flex-col fixed gap-0 h-screen bg-neutral-950 w-60 border-r-2 border-neutral-800">
@@ -39,28 +50,32 @@ const Sidebar: React.FC = () => {
             Projetos
           </Link>
           <Link
-            to="/products"
-            className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${isActive('/products') ? 'bg-muted text-primary' : 'text-muted-foreground'
+            to="/createProjects"
+            className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${isActive('/createProjects') ? 'bg-muted text-primary' : 'text-muted-foreground'
               }`}
           >
             <CircleFadingPlus className=" h-6 w-6" />
             Criar Projeto
           </Link>
           <Link
-            to="/customers"
-            className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${isActive('/customers') ? 'bg-muted text-primary' : 'text-muted-foreground'
+            to="/collaborators"
+            className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${isActive('/collaborators') ? 'bg-muted text-primary' : 'text-muted-foreground'
               }`}
           >
             <Users className=" h-6 w-6" />
             Colaboradores
           </Link>
         </nav>
-        <div className='px-4'>
+        <div className='px-4 ' onClick={handleLogout} >
           <Button className='w-full'>
             Sair
           </Button>
         </div>
       </div>
+
+
+
+
     </div>
   );
 };
