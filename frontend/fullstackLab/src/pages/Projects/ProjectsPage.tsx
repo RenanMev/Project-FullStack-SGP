@@ -9,6 +9,7 @@ const ProjectsList: React.FC = () => {
   const { darkMode } = useTheme()
 
 
+
   return (
     <section className={`${darkMode ? "bg-neutral-950" : "bg-white"} h-screen w-full p-6`}>
       <div className='flex gap-4 items-center'>

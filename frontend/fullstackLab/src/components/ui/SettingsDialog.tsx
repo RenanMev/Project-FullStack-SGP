@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -13,12 +13,23 @@ import { Settings2 } from "lucide-react";
 import { Label } from "@radix-ui/react-label";
 import { Input } from "./input";
 import { useTheme } from "@/context/ThemeContext";
+import { useUser } from "@/context/UserContext";
 
 const EditUserDialog: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [userName, setUserName] = useState("John Doe");
-  const [userEmail, setUserEmail] = useState("john.doe@example.com");
+  const { userData } = useUser();
   const { darkMode } = useTheme();
+  
+  const [isOpen, setIsOpen] = useState(false);
+  const [userName, setUserName] = useState<string>("");
+  const [userEmail, setUserEmail] = useState<string>("");
+
+  useEffect(() => {
+    if (userData) {
+      setUserName(userData.nome);
+      setUserEmail(userData.email);
+    }
+  }, [userData]);
+
   const toggleDialog = () => {
     setIsOpen(!isOpen);
   };
@@ -32,7 +43,7 @@ const EditUserDialog: React.FC = () => {
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <Button onClick={toggleDialog} className=" rounded-full pt-1">
+          <Button onClick={toggleDialog} className="rounded-full pt-1">
             <Settings2 className="h-4 w-4" />
           </Button>
         </DialogTrigger>

@@ -10,20 +10,23 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState, ChangeEvent, FormEvent } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { axiosInstance } from "@/axiosConfig";
 
 export const description =
-  "Um formulário de cadastro com nome, sobrenome, email e senha dentro de um card.";
+  "Um formulário de cadastro com nome, email e senha dentro de um card.";
 
 const RegisterPage = () => {
   const [formValue, setFormValue] = useState({
-    firstName: "",
-    lastName: "",
+    nome: "",
     email: "",
-    password: "",
+    senha: "",
+    papel: ""
   });
   const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -37,7 +40,7 @@ const RegisterPage = () => {
       setEmailError(isValidEmail ? null : "O email deve ser válido");
     }
 
-    if (id === "password") {
+    if (id === "senha") {
       const hasNumber = /\d/;
       const hasLetter = /[a-zA-Z]/;
       const isValidPassword =
@@ -50,30 +53,47 @@ const RegisterPage = () => {
     }
   };
 
+  const handleSelectChange = (value: string) => {
+    setFormValue((prevValue) => ({
+      ...prevValue,
+      papel: value,
+    }));
+  };
+
   const isFormValid = () => {
     const isFormFilled =
-      formValue.firstName.trim() !== "" &&
-      formValue.lastName.trim() !== "" &&
+      formValue.nome.trim() !== "" &&
       formValue.email.trim() !== "" &&
-      formValue.password.trim() !== "";
+      formValue.senha.trim() !== "" &&
+      formValue.papel.trim() !== "";
 
     const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formValue.email);
     const hasNumber = /\d/;
     const hasLetter = /[a-zA-Z]/;
     const isValidPassword =
-      formValue.password.length >= 8 &&
-      hasNumber.test(formValue.password) &&
-      hasLetter.test(formValue.password);
+      formValue.senha.length >= 8 &&
+      hasNumber.test(formValue.senha) &&
+      hasLetter.test(formValue.senha);
 
     return isFormFilled && isValidEmail && isValidPassword;
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (isFormValid()) {
-      console.log("Formulário enviado:", formValue);
-    }
+    await axiosInstance.post("/auth/register", formValue).then((res) => {
+      if (res.status === 201) {
+        const sessionToken = res.data.token
+        const user = res.data.id
+        localStorage.setItem("sessionToken", sessionToken)
+        localStorage.setItem("user", user)
+        navigate('/main');
+      }
+    })
   };
+
+  const papel = [
+    'Gerente', 'Desenvolvedor', 'Designer', "QA"
+  ]
 
   return (
     <div className="h-screen w-screen flex justify-center items-center bg-neutral-50 dark:bg-neutral-950">
@@ -91,74 +111,80 @@ const RegisterPage = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="grid gap-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="first-name">Nome</Label>
+                  <Label htmlFor="nome">Nome</Label>
                   <Input
-                    id="firstName"
+                    id="nome"
                     placeholder="Max"
                     required
-                    value={formValue.firstName}
+                    value={formValue.nome}
                     onChange={handleInputChange}
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="last-name">Sobrenome</Label>
+                  <Label htmlFor="email">Email</Label>
                   <Input
-                    id="lastName"
-                    placeholder="Robinson"
+                    id="email"
+                    type="email"
+                    placeholder="m@exemplo.com"
                     required
-                    value={formValue.lastName}
+                    value={formValue.email}
                     onChange={handleInputChange}
                   />
+                  {emailError && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="text-red-500 text-sm"
+                    >
+                      {emailError}
+                    </motion.p>
+                  )}
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="senha">Senha</Label>
+                  <Input
+                    id="senha"
+                    type="password"
+                    placeholder="********"
+                    required
+                    value={formValue.senha}
+                    onChange={handleInputChange}
+                  />
+                  {passwordError && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="text-red-500 text-sm"
+                    >
+                      {passwordError}
+                    </motion.p>
+                  )}
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="papel">Cargo</Label>
+                  <Select onValueChange={handleSelectChange} value={formValue.papel}>
+                    <SelectTrigger className='w-full'>
+                      <SelectValue placeholder='Selecione o cargo' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {papel.map((item) => (
+                        <SelectItem key={item} value={item}>
+                          {item}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@exemplo.com"
-                  required
-                  value={formValue.email}
-                  onChange={handleInputChange}
-                />
-                {emailError && (
-                  <motion.p
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="text-red-500 text-sm"
-                  >
-                    {emailError}
-                  </motion.p>
-                )}
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="password">Senha</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="********"
-                  required
-                  value={formValue.password}
-                  onChange={handleInputChange}
-                />
-                {passwordError && (
-                  <motion.p
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="text-red-500 text-sm"
-                  >
-                    {passwordError}
-                  </motion.p>
-                )}
-              </div>
+
               <Button type="submit" className="w-full" disabled={!isFormValid()}>
                 Criar conta
               </Button>
-              {!isFormValid() && <p className="flex justify-center text-neutral-600">É necessario prencher o formulario!</p>}
+              {!isFormValid() && <p className="flex justify-center text-neutral-600">É necessário preencher o formulário!</p>}
             </form>
             <div className="mt-4 text-center text-sm">
               Já tem uma conta?{" "}

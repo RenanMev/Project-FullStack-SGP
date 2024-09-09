@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { ThemeProvider } from "./context/ThemeContext";
 import AppRoutes from "./routes";
+import { UserProvider } from './context/UserContext';
 
 const App = () => {
   useEffect(() => {
@@ -9,7 +10,9 @@ const App = () => {
 
   return (
     <ThemeProvider>
-      <AppRoutes />
+      <UserProvider>
+        <AppRoutes />
+      </UserProvider>
     </ThemeProvider>
   );
 }

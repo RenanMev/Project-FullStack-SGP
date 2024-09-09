@@ -11,18 +11,25 @@ import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
 import { Button } from '../ui/button';
 import EditUserDialog from '../ui/SettingsDialog';
 import { LogoutIsAcout } from '@/services/utils/auth';
-import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
+import { useUser } from '@/context/UserContext';
 
 
 const Sidebar: React.FC = () => {
+  const { userData } = useUser();
   const navigate = useNavigate();
   const location = useLocation();
   const isActive = (path: string) => location.pathname === path;
 
   const handleLogout = () => {
     LogoutIsAcout();
+    localStorage.removeItem("sessionToken")
     navigate('/');
   }
+
+  const capitalizeFirstLetter = (value: String) => {
+    return value.charAt(0).toUpperCase() + value.slice(1);
+  };
+  
 
 
 
@@ -35,8 +42,9 @@ const Sidebar: React.FC = () => {
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
         <div className='text-neutral-50 font-medium'>
-          Renan Mev
+          {userData ? capitalizeFirstLetter(userData.nome) : 'Usuário não encontrado'}
         </div>
+
         <EditUserDialog />
       </div>
       <div className='flex flex-col h-full py-6'>

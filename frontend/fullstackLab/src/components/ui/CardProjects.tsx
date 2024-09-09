@@ -1,11 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './card';
 import { Project, projectsTypes } from '@/types/projectsTypes';
 import { Eye, Pencil } from 'lucide-react';
-import EditProjectDialog from './EditProjectDialog'; 
+import EditProjectDialog from './EditProjectDialog';
 import ViewProjectDialog from './ViewProjectDialog';
+import { api } from '@/axiosConfig';
 
 const CardProjects: React.FC = () => {
+
+
+ 
+
+
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openViewDialog, setOpenViewDialog] = useState(false);

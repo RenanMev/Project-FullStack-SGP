@@ -12,15 +12,16 @@ import { useState, ChangeEvent, FormEvent } from "react";
 import { motion } from "framer-motion";
 import Logo from "../../assets/image/Logo/Logo Renan.svg";
 import { Link, useNavigate } from 'react-router-dom';
+import { axiosInstance } from "@/axiosConfig";
 
 
 export const description =
   "Um formulário de login simples com email e senha. O botão de envio diz 'Entrar'.";
 
 const LoginPage = () => {
-  const [formValue, setFormValue] = useState<{ email: string; password: string }>({
+  const [formValue, setFormValue] = useState<{ email: string; senha: string }>({
     email: '',
-    password: ''
+    senha: ''
   });
   const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
@@ -45,11 +46,11 @@ const LoginPage = () => {
     }
   };
 
-  const handleSubmit = (event: FormEvent) => {
+  const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
 
     const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formValue.email);
-    const isValidPassword = formValue.password.length >= 8;
+    const isValidPassword = formValue.senha.length >= 8;
 
     if (!isValidEmail) {
       setEmailError('O email deve ser válido e terminar com ".com"');
@@ -60,13 +61,24 @@ const LoginPage = () => {
     }
 
     if (isValidEmail && isValidPassword) {
+      axiosInstance.post('/auth/login', formValue).then((res) => {
+        if (res.status === 200) {
+          const sessionToken = res.data.token
+          const user = res.data.id
+          localStorage.setItem("sessionToken", sessionToken)
+          localStorage.setItem("user", user)
+
+          navigate('/main');
+        }
+      })
+
       setEmailError(null);
       setPasswordError(null);
     }
   };
 
   const isFormValid = formValue.email.trim() !== '' &&
-    formValue.password.trim() !== '' &&
+    formValue.senha.trim() !== '' &&
     !emailError &&
     !passwordError;
 
@@ -131,9 +143,9 @@ const LoginPage = () => {
                   </Link>
                 </div>
                 <Input
-                  id="password"
+                  id="senha"
                   type="password"
-                  value={formValue.password}
+                  value={formValue.senha}
                   onChange={handleValueForm}
                   required
                   aria-required="true"

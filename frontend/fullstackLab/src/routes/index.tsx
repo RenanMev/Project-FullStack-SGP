@@ -8,13 +8,17 @@ import NotFound from '@/pages/notFound';
 import ProjectsList from '@/pages/Projects/ProjectsPage';
 import CreateProjects from '@/pages/CreateProjects/CreateProjects';
 import Collaborators from '@/pages/Collaborators/Collaborators';
+import RouteAuth from './RouteAuth';
 
 const AppRoutes: React.FC = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        <Route element={<RouteAuth />}>
+          <Route path="/" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+        </Route>
+
         <Route element={<ProtectedRoute />}>
           <Route element={<ProtectedLayout />}>
             <Route path="/projects" element={<ProjectsList />} />
@@ -22,6 +26,7 @@ const AppRoutes: React.FC = () => {
             <Route path="/collaborators" element={<Collaborators />} />
           </Route>
         </Route>
+
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
