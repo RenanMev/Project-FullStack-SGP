@@ -1,6 +1,9 @@
 # Teste para FALAE
 
+![Texto alternativo](./Assets/image.png)
+
 Este projeto está dividido em duas partes: **frontend** e **backend**.
+
 
 ## Tecnologias Utilizadas
 
