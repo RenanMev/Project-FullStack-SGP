@@ -1,20 +1,17 @@
 import axios from 'axios';
 
-// Criação da instância axios padrão
-export const axiosInstance = axios.create({
-  baseURL: 'http://localhost:3000/',
+export const apiAuth = axios.create({
+  baseURL: 'http://localhost:3000/api/auth',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Função para obter o token do localStorage
 const getAuthToken = () => {
-  return localStorage.getItem('sessionToken'); // Corrija 'seesionToken' para 'sessionToken'
+  return localStorage.getItem('sessionToken');
 };
 
-// Criação da instância axios para API protegida
 export const api = axios.create({
   baseURL: 'http://localhost:3000/api',
   timeout: 10000,

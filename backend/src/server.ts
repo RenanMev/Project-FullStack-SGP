@@ -1,28 +1,19 @@
-// src/server.ts
+import app from './app';
+import sequelize from './config/db.config';
 
-import express from 'express';
-import dotenv from 'dotenv';
-import cors from 'cors'; // Importa o pacote cors
-import authRoutes from './routes/authRoutes';
-import userRoutes from './routes/userRoutes';
-
-dotenv.config();
-
-const app = express();
-
-
-app.use(cors({
-  origin: 'http://localhost:5173', 
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true,
-}));
-
-app.use(express.json());
-
-app.use('/auth', authRoutes);
-app.use('/api', userRoutes);
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-});
+
+const startServer = async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('Conectado ao banco de dados.');
+    app.listen(PORT, () => {
+      console.log(`Servidor rodando na porta ${PORT}`);
+    });
+  } catch (error) {
+    console.error('Não foi possível conectar ao banco de dados:', error);
+  }
+};
+
+startServer();

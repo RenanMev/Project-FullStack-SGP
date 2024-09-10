@@ -12,7 +12,7 @@ import { useState, ChangeEvent, FormEvent } from "react";
 import { motion } from "framer-motion";
 import Logo from "../../assets/image/Logo/Logo Renan.svg";
 import { Link, useNavigate } from 'react-router-dom';
-import { axiosInstance } from "@/axiosConfig";
+import { apiAuth } from "@/axiosConfig";
 
 
 export const description =
@@ -61,7 +61,7 @@ const LoginPage = () => {
     }
 
     if (isValidEmail && isValidPassword) {
-      axiosInstance.post('/auth/login', formValue).then((res) => {
+      apiAuth.post('/login', formValue).then((res) => {
         if (res.status === 200) {
           const sessionToken = res.data.token
           const user = res.data.id

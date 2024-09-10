@@ -12,7 +12,7 @@ import { useState, ChangeEvent, FormEvent } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { axiosInstance } from "@/axiosConfig";
+import { apiAuth } from "@/axiosConfig";
 
 export const description =
   "Um formulário de cadastro com nome, email e senha dentro de um card.";
@@ -80,7 +80,7 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    await axiosInstance.post("/auth/register", formValue).then((res) => {
+    await apiAuth.post("/register", formValue).then((res) => {
       if (res.status === 201) {
         const sessionToken = res.data.token
         const user = res.data.id

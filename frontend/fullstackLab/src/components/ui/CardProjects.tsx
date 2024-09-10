@@ -7,11 +7,6 @@ import ViewProjectDialog from './ViewProjectDialog';
 import { api } from '@/axiosConfig';
 
 const CardProjects: React.FC = () => {
-
-
- 
-
-
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openViewDialog, setOpenViewDialog] = useState(false);

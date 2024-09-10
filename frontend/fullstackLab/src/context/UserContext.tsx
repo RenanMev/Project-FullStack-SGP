@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { api } from "@/axiosConfig";
+import { api, apiAuth } from "@/axiosConfig";
 
 interface UserData {
   id: string;
@@ -22,12 +22,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const fetchUserData = async () => {
       const userId = localStorage.getItem('user');
       if (userId) {
-        try {
-          const response = await api.get(`/getUser/${userId}`);
-          setUserData(response.data);
-        } catch (error) {
-          console.warn('Erro ao buscar dados do usuário:', error);
-        }
+        await apiAuth.get(`/getUser/${userId}`).then((res) => {
+          setUserData(res.data);
+        }).catch((err) => {
+          console.warn('Erro ao buscar dados do usuário:', err);
+        })
       } else {
         console.warn('Usuário não encontrado no localStorage');
       }
