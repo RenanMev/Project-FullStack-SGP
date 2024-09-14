@@ -2,7 +2,6 @@
 
 Este projeto está dividido em duas partes: **frontend** e **backend**.
 
-
 ## Tecnologias Utilizadas
 
 - **Frontend:**
@@ -26,8 +25,9 @@ O banco de dados está hospedado na AWS. Para conectar ao banco, você precisar�
 ```
 DB_HOST=database-1.cb6ayoocw69o.us-east-2.rds.amazonaws.com
 DB_USER=root
-DB_PASS=dlg7843d2
-DB_NAME=fullstackaws
+DB_PASS=dW5#Tz8r3L!9Qz1V
+DB_NAME=fullstacklab
+DB_PORT=3306
 ```
 
 ## Como Rodar o Projeto
