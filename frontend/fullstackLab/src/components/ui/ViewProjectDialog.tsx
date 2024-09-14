@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Dialog, DialogContent, DialogTitle } from './dialog';
 import { Project } from '@/types/projectsTypes';
 import { useTheme } from '@/context/ThemeContext';
@@ -10,7 +10,7 @@ interface ViewProjectDialogProps {
 }
 
 const ViewProjectDialog: React.FC<ViewProjectDialogProps> = ({ project, open, onClose }) => {
-  const darkMode = useTheme()
+  const darkMode = useTheme();
 
   if (!project) return null;
 
@@ -22,12 +22,11 @@ const ViewProjectDialog: React.FC<ViewProjectDialogProps> = ({ project, open, on
         <p>Data de Início: {new Date(project.data_inicio).toLocaleDateString()}</p>
         <p>Data de Fim: {new Date(project.data_fim).toLocaleDateString()}</p>
         <p>Status: {project.status}</p>
-        <p>Responsável: {project.responsibleName}</p>
         <div>
           <p>Colaboradores:</p>
           <ul>
-            {project.collaborators.length > 0 ? (
-              project.collaborators.map((collaborator) => (
+            {project.collaborators && project.collaborators.length > 0 ? (
+              project.collaborators.map(collaborator => (
                 <li key={collaborator.id}>{collaborator.name}</li>
               ))
             ) : (

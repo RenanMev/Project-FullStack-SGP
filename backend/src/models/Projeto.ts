@@ -1,9 +1,8 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import sequelize from '../config/db.config';
-import User from './User';
-import ProjetosUsuarios from './ProjetosUsuarios';
+import Usuarios from './Usuarios';
 
-interface ProjetoAttributes {
+interface ProjectAttributes {
   id: number;
   nome: string;
   descricao?: string;
@@ -14,9 +13,9 @@ interface ProjetoAttributes {
   updatedAt?: Date;
 }
 
-interface ProjetoCreationAttributes extends Optional<ProjetoAttributes, 'id'> { }
+interface ProjectCreationAttributes extends Optional<ProjectAttributes, 'id'> {}
 
-class Projeto extends Model<ProjetoAttributes, ProjetoCreationAttributes> implements ProjetoAttributes {
+class Project extends Model<ProjectAttributes, ProjectCreationAttributes> implements ProjectAttributes {
   public id!: number;
   public nome!: string;
   public descricao?: string;
@@ -25,11 +24,10 @@ class Projeto extends Model<ProjetoAttributes, ProjetoCreationAttributes> implem
   public status!: string;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
-
-  public readonly Usuarios?: User[]; 
+  public readonly Usuarios?: Usuarios[];
 }
 
-Projeto.init(
+Project.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -59,24 +57,10 @@ Projeto.init(
   },
   {
     sequelize,
-    modelName: 'Projeto',
-    tableName: 'Projetos',
-    timestamps: true,
+    modelName: 'Project',
+    tableName: 'projetos',
+    timestamps: false,
   }
 );
 
-Projeto.belongsToMany(User, {
-  through: ProjetosUsuarios,
-  as: 'Usuarios',
-  foreignKey: 'projeto_id', 
-  otherKey: 'usuario_id',
-});
-
-User.belongsToMany(Projeto, {
-  through: ProjetosUsuarios,
-  as: 'Projetos',
-  foreignKey: 'usuario_id',
-  otherKey: 'projeto_id',
-});
-
-export default Projeto;
+export default Project;

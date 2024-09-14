@@ -1,7 +1,7 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import sequelize from '../config/db.config';
 
-interface UserAttributes {
+interface UsuariosAttributes {
   id?: number;
   nome: string;
   email: string;
@@ -9,9 +9,9 @@ interface UserAttributes {
   papel: string;
 }
 
-interface UserCreationAttributes extends Optional<UserAttributes, 'id'> {}
+interface UsuariosCreationAttributes extends Optional<UsuariosAttributes, 'id'> {}
 
-class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
+class Usuarios extends Model<UsuariosAttributes, UsuariosCreationAttributes> implements UsuariosAttributes {
   public id!: number;
   public nome!: string;
   public email!: string;
@@ -22,7 +22,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   public readonly updatedAt!: Date;
 }
 
-User.init({
+Usuarios.init({
   nome: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -46,4 +46,4 @@ User.init({
   timestamps: false,
 });
 
-export default User;
+export default Usuarios;

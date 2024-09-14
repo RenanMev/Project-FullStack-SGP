@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import User from '../models/User';
+import User from '../models/Usuarios';
 import { Request, Response } from 'express';
 
 const JWT_SECRET = "F4T0DhrBz3cYh0C9w1jJkq5r7eN8Lm2oQxv9k6U1rH8Zp3G7sV0tOaK4lN5F6Wz";

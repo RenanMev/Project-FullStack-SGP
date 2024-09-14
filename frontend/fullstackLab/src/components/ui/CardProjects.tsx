@@ -1,17 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './card';
-import { Project, projectsTypes } from '@/types/projectsTypes';
+import { Project } from '@/types/projectsTypes';
 import { Eye, Pencil } from 'lucide-react';
 import EditProjectDialog from './EditProjectDialog';
 import ViewProjectDialog from './ViewProjectDialog';
-import { api } from '@/axiosConfig';
 
-const CardProjects: React.FC = () => {
+interface CardProjectsProps {
+  data: Project[];
+}
+
+const CardProjects: React.FC<CardProjectsProps> = ({ data }) => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openViewDialog, setOpenViewDialog] = useState(false);
 
   const handleEditClick = (project: Project) => {
+    console.log(project)
     setSelectedProject(project);
     setOpenEditDialog(true);
   };
@@ -32,7 +36,7 @@ const CardProjects: React.FC = () => {
 
   return (
     <div className="flex gap-8 p-4">
-      {projectsTypes.map((project) => (
+      {data.map((project) => (
         <Card key={project.id} className='max-w-96 min-w-80'>
           <CardHeader>
             <CardTitle>

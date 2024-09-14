@@ -2,8 +2,9 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors'; 
 import userRoutes from './routes/userRoutes';
-import projetoRoutes from './routes/projectsRoutes';
+import projectRoutes from './routes/projectsRoutes';
 import sequelize from './config/db.config';
+import router from './routes/authRoutes';
 
 dotenv.config();
 
@@ -17,7 +18,8 @@ app.use(cors({
 
 app.use(express.json());
 
-app.use('/api/auth', userRoutes);
-app.use('/api/projetos', projetoRoutes);
+app.use('/api/auth', router);
+app.use('/api/projetos', projectRoutes);
+app.use('/api/user', userRoutes);
 
 export default app;

@@ -24,6 +24,7 @@ const EditProjectDialog: React.FC<EditProjectDialogProps> = ({ project, open, on
     endDate: undefined as Date | undefined,
   });
 
+  const people = project?.collaborators || [];
   const [tempDates, setTempDates] = useState({
     tempStartDate: undefined as Date | undefined,
     tempEndDate: undefined as Date | undefined,
@@ -37,16 +38,8 @@ const EditProjectDialog: React.FC<EditProjectDialogProps> = ({ project, open, on
     data_inicio: '',
     data_fim: '',
     status: 'Em andamento',
-    responsibleID: 0,
-    responsibleName: '',
-    collaborators: []
+    collaborators: [],
   });
-
-  const people = [
-    { id: 1, name: 'João' },
-    { id: 2, name: 'Maria' },
-    { id: 3, name: 'Pedro' },
-  ];
 
   useEffect(() => {
     if (project) {
@@ -78,13 +71,18 @@ const EditProjectDialog: React.FC<EditProjectDialogProps> = ({ project, open, on
         });
         setEditedProject(prev => ({
           ...prev,
-          data_inicio: tempDates.tempStartDate ? tempDates.tempStartDate.toISOString().split('T')[0] : "",
-          data_fim: tempDates.tempEndDate ? tempDates.tempEndDate.toISOString().split('T')[0] : "",
+          data_inicio: tempDates.tempStartDate ? tempDates.tempStartDate.toISOString().split('T')[0] : '',
+          data_fim: tempDates.tempEndDate ? tempDates.tempEndDate.toISOString().split('T')[0] : '',
         }));
         setOpenDialogCalendar(false);
+        onSave({
+          ...editedProject,
+          data_inicio: tempDates.tempStartDate.toISOString().split('T')[0],
+          data_fim: tempDates.tempEndDate.toISOString().split('T')[0],
+        });
       }
     }
-  }, [tempDates, setEditedProject, setDate, setOpenDialogCalendar]);
+  }, [tempDates, onSave, editedProject]);
 
   const disabledCalendarSubmit = () => {
     return !tempDates.tempStartDate || !tempDates.tempEndDate || tempDates.tempStartDate > tempDates.tempEndDate;
@@ -109,18 +107,6 @@ const EditProjectDialog: React.FC<EditProjectDialogProps> = ({ project, open, on
               placeholder="Descrição"
               className="w-full p-2 border rounded"
             />
-            <Select onValueChange={(value) => setEditedProject({ ...editedProject, responsibleID: parseInt(value) })} value={editedProject.responsibleID.toString()}>
-              <SelectTrigger className='w-full'>
-                <SelectValue placeholder='Selecione a pessoa responsável' />
-              </SelectTrigger>
-              <SelectContent>
-                {people.map((person) => (
-                  <SelectItem key={person.id} value={person.id.toString()}>
-                    {person.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
             <div className='flex border border-neutral-700 rounded-xl p-2 gap-4 cursor-pointer' onClick={handleOpenDialogCalendar}>
               {date.startDate && date.endDate && (
                 <div>
@@ -131,6 +117,24 @@ const EditProjectDialog: React.FC<EditProjectDialogProps> = ({ project, open, on
                 <CalendarArrowUp />
               </div>
             </div>
+            <Select
+              onValueChange={(value) => setEditedProject(prev => ({
+                ...prev,
+                collaborators: people.filter(person => person.id === Number(value))
+              }))}
+              value={editedProject.collaborators.map(c => c.id.toString()).join(',')}
+            >
+              <SelectTrigger className='w-full'>
+                <SelectValue placeholder='Selecione o participante' />
+              </SelectTrigger>
+              <SelectContent>
+                {people.map((person) => (
+                  <SelectItem key={person.id} value={person.id.toString()}>
+                    {person.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <DialogFooter>
             <Button variant="destructive" onClick={() => onDelete(editedProject.id)}>
@@ -170,16 +174,12 @@ const EditProjectDialog: React.FC<EditProjectDialogProps> = ({ project, open, on
                 <div className='text-red-600'>A data inicial tem que ser menor que a data final!</div>
               )}
               <div className='flex items-end w-full justify-end gap-6'>
-                <div>
-                  <Button variant='outline' className='mt-2' onClick={() => setOpenDialogCalendar(false)}>
-                    Cancelar
-                  </Button>
-                </div>
-                <div>
-                  <Button className='mt-2' onClick={handleSave} disabled={disabledCalendarSubmit()}>
-                    Confirmar
-                  </Button>
-                </div>
+                <Button variant='outline' className='mt-2' onClick={() => setOpenDialogCalendar(false)}>
+                  Cancelar
+                </Button>
+                <Button className='mt-2' onClick={handleSave} disabled={disabledCalendarSubmit()}>
+                  Confirmar
+                </Button>
               </div>
             </DialogContent>
           </DialogHeader>

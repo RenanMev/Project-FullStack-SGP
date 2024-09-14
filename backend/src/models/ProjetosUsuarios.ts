@@ -1,7 +1,7 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import sequelize from '../config/db.config';
-import Projeto from './Projects'; 
-import User from './User'; 
+import Projeto from './Projeto'; 
+import User from './Usuarios'; 
 
 interface ProjetosUsuariosAttributes {
   projeto_id: number;
@@ -41,18 +41,20 @@ ProjetosUsuarios.init(
     sequelize,
     modelName: 'ProjetosUsuarios',
     tableName: 'Projetos_Usuarios',
-    timestamps: true,
+    timestamps: false,
   }
 );
 
 Projeto.belongsToMany(User, {
   through: ProjetosUsuarios,
+  as: 'Usuarios',
   foreignKey: 'projeto_id',
   otherKey: 'usuario_id',
 });
 
 User.belongsToMany(Projeto, {
   through: ProjetosUsuarios,
+  as: 'Projetos',
   foreignKey: 'usuario_id',
   otherKey: 'projeto_id',
 });

@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
-import Projeto from '../models/Projects';
-import User from '../models/User'; 
+import Projeto from '../models/Projeto';
 import ProjetoUsuario from '../models/ProjetosUsuarios';
 import ProjetosUsuarios from '../models/ProjetosUsuarios';
+import Usuarios from '../models/Usuarios';
+import Project from '../models/Projeto';
 
-export const listarProjetos = async (req: Request, res: Response): Promise<Response> => {
+export const ListAllProjects = async (req: Request, res: Response): Promise<Response> => {
   try {
     const projetos = await Projeto.findAll();
     if (projetos.length === 0) {
@@ -17,7 +18,7 @@ export const listarProjetos = async (req: Request, res: Response): Promise<Respo
   }
 };
 
-export const cadastrarProjeto = async (req: Request, res: Response): Promise<Response> => {
+export const registerProjects = async (req: Request, res: Response): Promise<Response> => {
   const { nome, descricao, data_inicio, data_fim, status } = req.body;
 
   try {
@@ -25,14 +26,14 @@ export const cadastrarProjeto = async (req: Request, res: Response): Promise<Res
       return res.status(400).json({ error: 'Nome, data_inicio e status são obrigatórios.' });
     }
 
-    const novoProjeto = await Projeto.create({ 
-      nome, 
-      descricao, 
-      data_inicio, 
-      status, 
-      data_fim 
+    const novoProjeto = await Projeto.create({
+      nome,
+      descricao,
+      data_inicio,
+      status,
+      data_fim
     });
-    
+
     return res.status(201).json(novoProjeto);
   } catch (error) {
     console.error('Erro ao cadastrar projeto:', error);
@@ -40,7 +41,7 @@ export const cadastrarProjeto = async (req: Request, res: Response): Promise<Res
   }
 };
 
-export const editarProjeto = async (req: Request, res: Response): Promise<Response> => {
+export const editProjects = async (req: Request, res: Response): Promise<Response> => {
   const id = parseInt(req.params.id, 10);
   const { nome, descricao, data_inicio, data_fim, status } = req.body;
 
@@ -73,7 +74,7 @@ export const editarProjeto = async (req: Request, res: Response): Promise<Respon
   }
 };
 
-export const removerProjeto = async (req: Request, res: Response): Promise<Response> => {
+export const deleteProjects = async (req: Request, res: Response): Promise<Response> => {
   const { id } = req.params;
 
   try {
@@ -90,16 +91,16 @@ export const removerProjeto = async (req: Request, res: Response): Promise<Respo
   }
 };
 
-export const listarUsuariosEmProjeto = async (req: Request, res: Response): Promise<Response> => {
+export const listUserinProjects = async (req: Request, res: Response): Promise<Response> => {
   const { projetoId } = req.params;
 
   try {
     console.log(`Buscando projeto com ID: ${projetoId}`);
     const projeto = await Projeto.findByPk(projetoId, {
       include: {
-        model: User,
+        model: Usuarios,
         through: { attributes: [] },
-        as: 'Usuarios' // Certifique-se de que o alias é 'Usuarios'
+        as: 'Usuarios'
       }
     });
 
@@ -116,7 +117,6 @@ export const listarUsuariosEmProjeto = async (req: Request, res: Response): Prom
       email: user.dataValues.email,
       papel: user.dataValues.papel
     }));
-    
 
     return res.status(200).json(usuarios);
   } catch (error) {
@@ -124,6 +124,75 @@ export const listarUsuariosEmProjeto = async (req: Request, res: Response): Prom
     return res.status(500).json({ mensagem: 'Erro ao listar usuários.' });
   }
 };
+
+
+export const addUserToProject = async (req: Request, res: Response): Promise<Response> => {
+
+  const projetoId = parseInt(req.params.projetoId);
+  const userId = parseInt(req.body.usuario_id);
+
+  try {
+    const projeto = await Projeto.findByPk(projetoId);
+    if (!projeto) {
+      return res.status(404).json({ error: 'Projeto não encontrado.' });
+    }
+
+    const usuario = await Usuarios.findByPk(userId);
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuário não encontrado.' });
+    }
+
+    const jaAdicionado = await ProjetosUsuarios.findOne({
+      where: { projeto_id: projetoId, usuario_id: userId },
+    });
+
+    if (jaAdicionado) {
+      return res.status(400).json({ error: 'Usuário já está adicionado ao projeto.' });
+    }
+
+    const novoRegistro = await ProjetosUsuarios.create({ projeto_id: projetoId, usuario_id: userId });
+
+    return res.status(201).json({ mensagem: 'Usuário adicionado ao projeto com sucesso.', novoRegistro });
+  } catch (error) {
+    console.error('Erro ao adicionar usuário ao projeto:', error);
+    return res.status(500).json({ error: 'Erro ao adicionar usuário ao projeto.', msg: (error as Error).message });
+  }
+};
+
+export const removeUserFromProject = async (req: Request, res: Response): Promise<Response> => {
+  const { projetoId, usuarioId } = req.params;
+
+  try {
+    const projeto = await Projeto.findByPk(projetoId);
+    if (!projeto) {
+      return res.status(404).json({ erro: 'Projeto não encontrado.' });
+    }
+
+    const usuario = await Usuarios.findByPk(usuarioId);
+    if (!usuario) {
+      return res.status(404).json({ erro: 'Usuário não encontrado.' });
+    }
+
+    const projetoUsuario = await ProjetosUsuarios.findOne({
+      where: {
+        projeto_id: projetoId,
+        usuario_id: usuarioId
+      }
+    });
+
+    if (!projetoUsuario) {
+      return res.status(400).json({ erro: 'Usuário não está atribuído ao projeto.' });
+    }
+
+    await projetoUsuario.destroy();
+
+    return res.status(204).send(); 
+  } catch (error) {
+    console.error('Erro ao remover usuário do projeto:', error);
+    return res.status(500).json({ erro: 'Erro ao remover usuário do projeto.' });
+  }
+};
+
 
 
 

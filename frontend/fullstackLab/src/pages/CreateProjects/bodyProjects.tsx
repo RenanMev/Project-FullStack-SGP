@@ -69,7 +69,6 @@ const BodyProjects: React.FC = () => {
       state.startDate &&
       state.endDate &&
       state.participants.length > 0 &&
-      state.responsible !== undefined &&
       state.endDate > state.startDate
     );
   };
@@ -168,21 +167,6 @@ const BodyProjects: React.FC = () => {
                   </div>
                 ))}
               </div>
-            </div>
-            <div className='w-full mb-6'>
-              <p className='mb-2'>Responsável</p>
-              <Select onValueChange={(value) => handleChange('responsible', Number(value))} value={state.responsible?.toString()}>
-                <SelectTrigger className='w-full'>
-                  <SelectValue placeholder='Selecione a pessoa responsável' />
-                </SelectTrigger>
-                <SelectContent>
-                  {people.map((person) => (
-                    <SelectItem key={person.id} value={person.id.toString()}>
-                      {person.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </div>
             <div>
               <Button className='w-full mt-2' onClick={startProject} disabled={!validateFields()}>
