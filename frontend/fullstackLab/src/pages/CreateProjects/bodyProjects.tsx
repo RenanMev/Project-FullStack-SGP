@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Calendar } from '@/components/ui/calendar';
-import { CalendarArrowUp, X } from 'lucide-react';
+import { CalendarArrowUp } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { api } from '@/axiosConfig';
 import Notification from '@/components/ui/notification';
@@ -23,8 +23,6 @@ const BodyProjects: React.FC = () => {
     startDate: undefined as Date | undefined,
     endDate: undefined as Date | undefined,
     responsible: undefined as number | undefined,
-    participants: [] as { id: number; nome: string }[],
-    selectedParticipant: undefined as number | undefined,
     alertOpen: false,
     dialogCalendar: false,
   });
@@ -42,25 +40,11 @@ const BodyProjects: React.FC = () => {
     setTempDates(prevState => ({ ...prevState, [field]: value }));
   };
 
-  const addParticipant = () => {
-    if (state.selectedParticipant !== undefined) {
-      const selectedPerson = people.find(p => p.id === state.selectedParticipant);
-      if (selectedPerson && !state.participants.some(p => p.id === selectedPerson.id)) {
-        handleChange('participants', [...state.participants, selectedPerson]);
-        handleChange('selectedParticipant', undefined);
-      }
-    }
-  };
-
   const disabledCalendarSubmit = () => {
     if (tempDates.tempStartDate && tempDates.tempEndDate) {
       return tempDates.tempEndDate > tempDates.tempStartDate;
     }
     return false;
-  };
-
-  const removeParticipant = (id: number) => {
-    handleChange('participants', state.participants.filter(p => p.id !== id));
   };
 
   const validateFields = () => {
@@ -69,7 +53,6 @@ const BodyProjects: React.FC = () => {
       state.projectDescription &&
       state.startDate &&
       state.endDate &&
-      state.participants.length > 0 &&
       state.endDate > state.startDate
     );
   };
@@ -87,8 +70,6 @@ const BodyProjects: React.FC = () => {
       startDate: undefined,
       endDate: undefined,
       responsible: undefined,
-      participants: [],
-      selectedParticipant: undefined,
       alertOpen: false,
       dialogCalendar: false,
     });
@@ -103,21 +84,8 @@ const BodyProjects: React.FC = () => {
       data_fim: state.endDate,
       status: 'Em andamento',
     };
-  
-    let idProject: number;
-  
+
     api.post('projetos', project)
-      .then((res) => {
-        idProject = res.data.id;
-        
-        const participantsPromises = state.participants.map((participant) => {
-          return api.post(`/projetos/${idProject}/usuarios`, {
-            usuario_id: participant.id,
-          });
-        });
-  
-        return Promise.all(participantsPromises);
-      })
       .then(() => {
         setTitleNotification('Projeto iniciado');
         setDescriptionNotification('O projeto foi iniciado com sucesso.');
@@ -130,10 +98,9 @@ const BodyProjects: React.FC = () => {
         setOpenNotification(true);
         console.log(err);
       });
-  
+
     handleChange('alertOpen', false);
   };
-  
 
   const saveDates = () => {
     handleChange('startDate', tempDates.tempStartDate);
@@ -154,6 +121,7 @@ const BodyProjects: React.FC = () => {
 
     fetchCollaborators();
   }, []);
+
   return (
     <>
       <Card className='flex-1 overflow-hidden'>
@@ -188,49 +156,15 @@ const BodyProjects: React.FC = () => {
                 </div>
               </div>
             </div>
-          </div>
-          <div className='w-full p-5 mt-4'>
-            <div className='w-full mb-6'>
-              <p className='mb-2'>Participantes</p>
-              <div className='flex gap-4'>
-                <Select
-                  onValueChange={(value) => handleChange('selectedParticipant', Number(value))}
-                  value={state.selectedParticipant?.toString()}
-                >
-                  <SelectTrigger className='w-full'>
-                    <SelectValue placeholder='Selecione o participante' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {people.map((person) => (
-                      <SelectItem key={person.id} value={person.id.toString()}>
-                        {person.nome}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Button onClick={addParticipant} disabled={state.selectedParticipant === undefined}>
-                  Adicionar
-                </Button>
-              </div>
-            </div>
-            <div className='w-full mb-6 flex'>
-              <div className='flex gap-4'>
-                {state.participants.map((participant) => (
-                  <div key={participant.id} className='flex items-center gap-2 justify-center hover:bg-white rounded-full hover:text-neutral-950 px-2 font-bold'>
-                    <span>{participant.nome}</span>
-                    <div className='w-4 h-4 rounded-full items-center flex cursor-pointer' onClick={() => removeParticipant(participant.id)}>
-                      <X />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <div className='w-full p-5 mt-4'>
             <div>
               <Button className='w-full mt-2' onClick={startProject} disabled={!validateFields()}>
                 Iniciar
               </Button>
             </div>
           </div>
+          </div>
+       
         </CardContent>
       </Card>
 
@@ -262,18 +196,7 @@ const BodyProjects: React.FC = () => {
               {!disabledCalendarSubmit() && (
                 <div className='text-red-600'>A data inicial tem que ser menor que a data final!</div>
               )}
-              <div className='flex items-end w-full justify-end gap-6'>
-                <div>
-                  <Button variant='outline' className='mt-2' onClick={() => handleChange('dialogCalendar', false)}>
-                    Cancelar
-                  </Button>
-                </div>
-                <div>
-                  <Button className='mt-2' onClick={saveDates} disabled={!disabledCalendarSubmit()}>
-                    Confirmar
-                  </Button>
-                </div>
-              </div>
+         
             </DialogContent>
           </DialogHeader>
         </DialogContent>
@@ -293,7 +216,6 @@ const BodyProjects: React.FC = () => {
           </div>
         </AlertDialogContent>
       </AlertDialog>
-
 
       {openNotification &&
         <Notification

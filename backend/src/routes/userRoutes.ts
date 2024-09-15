@@ -5,8 +5,8 @@ import { register, login } from '../controllers/authController';
 
 const router = express.Router();
 
-router.get('/users', authenticateJWT, getAllUsers);
+router.get('/usuarios', authenticateJWT, getAllUsers);
 
-router.get('/getUser/:userId', authenticateJWT, getUser);
+router.get('/usuarios/:userId', authenticateJWT, getUser);
 
 export default router;
