@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Calendar } from '@/components/ui/calendar';
-import { CalendarArrowUp } from 'lucide-react';
+import { CalendarArrowUp, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { api } from '@/axiosConfig';
 import Notification from '@/components/ui/notification';
@@ -23,6 +23,7 @@ const BodyProjects: React.FC = () => {
     startDate: undefined as Date | undefined,
     endDate: undefined as Date | undefined,
     responsible: undefined as number | undefined,
+    selectedParticipant: undefined as number | undefined,
     alertOpen: false,
     dialogCalendar: false,
   });
@@ -40,12 +41,15 @@ const BodyProjects: React.FC = () => {
     setTempDates(prevState => ({ ...prevState, [field]: value }));
   };
 
+
+
   const disabledCalendarSubmit = () => {
     if (tempDates.tempStartDate && tempDates.tempEndDate) {
       return tempDates.tempEndDate > tempDates.tempStartDate;
     }
     return false;
   };
+
 
   const validateFields = () => {
     return (
@@ -70,6 +74,7 @@ const BodyProjects: React.FC = () => {
       startDate: undefined,
       endDate: undefined,
       responsible: undefined,
+      selectedParticipant: undefined,
       alertOpen: false,
       dialogCalendar: false,
     });
@@ -84,7 +89,9 @@ const BodyProjects: React.FC = () => {
       data_fim: state.endDate,
       status: 'Em andamento',
     };
-
+  
+    let idProject: number;
+  
     api.post('projetos', project)
       .then(() => {
         setTitleNotification('Projeto iniciado');
@@ -98,9 +105,10 @@ const BodyProjects: React.FC = () => {
         setOpenNotification(true);
         console.log(err);
       });
-
+  
     handleChange('alertOpen', false);
   };
+  
 
   const saveDates = () => {
     handleChange('startDate', tempDates.tempStartDate);
@@ -121,7 +129,6 @@ const BodyProjects: React.FC = () => {
 
     fetchCollaborators();
   }, []);
-
   return (
     <>
       <Card className='flex-1 overflow-hidden'>
@@ -156,15 +163,15 @@ const BodyProjects: React.FC = () => {
                 </div>
               </div>
             </div>
-            <div className='w-full p-5 mt-4'>
+          </div>
+          <div className='w-full p-5 mt-4'>
+         
             <div>
               <Button className='w-full mt-2' onClick={startProject} disabled={!validateFields()}>
                 Iniciar
               </Button>
             </div>
           </div>
-          </div>
-       
         </CardContent>
       </Card>
 
@@ -196,7 +203,18 @@ const BodyProjects: React.FC = () => {
               {!disabledCalendarSubmit() && (
                 <div className='text-red-600'>A data inicial tem que ser menor que a data final!</div>
               )}
-         
+              <div className='flex items-end w-full justify-end gap-6'>
+                <div>
+                  <Button variant='outline' className='mt-2' onClick={() => handleChange('dialogCalendar', false)}>
+                    Cancelar
+                  </Button>
+                </div>
+                <div>
+                  <Button className='mt-2' onClick={saveDates} disabled={!disabledCalendarSubmit()}>
+                    Confirmar
+                  </Button>
+                </div>
+              </div>
             </DialogContent>
           </DialogHeader>
         </DialogContent>
@@ -216,6 +234,7 @@ const BodyProjects: React.FC = () => {
           </div>
         </AlertDialogContent>
       </AlertDialog>
+
 
       {openNotification &&
         <Notification

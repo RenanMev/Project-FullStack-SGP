@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './card';
 import { Project } from '@/types/projectsTypes';
 import { Eye, Pencil } from 'lucide-react';
 import ViewProjectDialog from './ViewProjectDialog';
 import EditProjectDialog from './EditProjectDialog';
+import { api } from '@/axiosConfig';
+import Notification from './notification';
 
 interface CardProjectsProps {
   data: Project[];
@@ -13,6 +15,10 @@ const CardProjects: React.FC<CardProjectsProps> = ({ data }) => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [openViewDialog, setOpenViewDialog] = useState(false);
+  const [openNotification, setOpenNotification] = useState(false);
+  const [titleAlert, setTitleAlert] = useState('');
+  const [messageAlert, setMessageAlert] = useState('');
+  const [collaborators, setCollaborators] = useState<any>([])
 
   const handleEditClick = (project: Project) => {
     console.log(project)
@@ -26,13 +32,73 @@ const CardProjects: React.FC<CardProjectsProps> = ({ data }) => {
   };
 
   const handleDeleteProject = (id: number) => {
-    console.log('Deletar projeto com id:', id);
+    api.delete(`/projetos/${id}`)
+      .then(res => {
+        setTitleAlert('Deletar');
+        setMessageAlert('Projeto deletado com sucesso!');
+        setOpenNotification(true);
+        setOpenEditDialog(false);
+        window.location.reload();
+      })
     setOpenEditDialog(false);
   };
 
-  const handleSaveProject = (updatedProject: Project) => {
-    console.log('Projeto salvo:', updatedProject);
+  const getUser = () => {
+    api.get('usuarios').then((res) => {
+      setCollaborators(res.data)
+    })
+  }
+
+
+  const handleSaveProject = async (updatedProject: Project, idColaboradores: number) => {
+    let userChangeSucess = false;
+
+    if (idColaboradores && idColaboradores > 0) {
+      await api.post(`/projetos/${updatedProject.id}/usuarios`, { usuario_id: idColaboradores })
+        .then((res) => {
+          userChangeSucess = true;
+        })
+        .catch((err) => {
+          setTitleAlert('Erro');
+          setMessageAlert(err.response?.data?.error || 'Erro desconhecido');
+          setOpenNotification(true);
+          setOpenEditDialog(false);
+          return;
+        });
+    } else {
+      userChangeSucess = true;
+    }
+
+    if (userChangeSucess) {
+      await api.put(`projetos/${updatedProject.id}`, updatedProject)
+        .then((res) => {
+          if (res.status === 200) {
+            setTitleAlert('Alteração');
+            setMessageAlert(userChangeSucess
+              ? 'Projeto e colaborador alterado com sucesso!'
+              : 'Projeto alterado com sucesso!');
+            setOpenNotification(true);
+            setOpenEditDialog(false);
+            window.location.reload();
+          }
+        })
+        .catch((error) => {
+          console.error('Erro ao fazer a requisição:', error);
+          setTitleAlert('Erro');
+          setMessageAlert('Erro ao salvar o projeto.');
+          setOpenNotification(true);
+        });
+    }
   };
+
+
+
+  useEffect(() => {
+    getUser()
+  }, [])
+
+
+
 
   return (
     <div className="flex gap-8 p-4">
@@ -73,6 +139,7 @@ const CardProjects: React.FC<CardProjectsProps> = ({ data }) => {
       ))}
 
       <EditProjectDialog
+        collaborators={collaborators}
         project={selectedProject}
         open={openEditDialog}
         onClose={() => setOpenEditDialog(false)}
@@ -85,6 +152,15 @@ const CardProjects: React.FC<CardProjectsProps> = ({ data }) => {
         open={openViewDialog}
         onClose={() => setOpenViewDialog(false)}
       />
+
+      {openNotification && (
+        <Notification
+          variant="default"
+          title={titleAlert}
+          description={messageAlert}
+          onClose={() => setOpenNotification(false)}
+        />
+      )}
     </div>
   );
 };
