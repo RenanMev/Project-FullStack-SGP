@@ -9,6 +9,7 @@ import ProjectsList from '@/pages/Projects/ProjectsPage';
 import CreateProjects from '@/pages/CreateProjects/CreateProjects';
 import Collaborators from '@/pages/Collaborators/Collaborators';
 import RouteAuth from './RouteAuth';
+import Dashboard from '@/pages/Dashboard/Dashboard';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -21,6 +22,7 @@ const AppRoutes: React.FC = () => {
 
         <Route element={<ProtectedRoute />}>
           <Route element={<ProtectedLayout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/projects" element={<ProjectsList />} />
             <Route path="/createProjects" element={<CreateProjects />} />
             <Route path="/collaborators" element={<Collaborators />} />

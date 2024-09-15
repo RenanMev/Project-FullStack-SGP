@@ -21,7 +21,6 @@ const CardProjects: React.FC<CardProjectsProps> = ({ data }) => {
   const [collaborators, setCollaborators] = useState<any>([])
 
   const handleEditClick = (project: Project) => {
-    console.log(project)
     setSelectedProject(project);
     setOpenEditDialog(true);
   };

@@ -13,9 +13,13 @@ import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiAuth } from "@/axiosConfig";
+import axios from 'axios';
+import Notification from "@/components/ui/notification";
 
 export const description =
   "Um formulário de cadastro com nome, email e senha dentro de um card.";
+
+
 
 const RegisterPage = () => {
   const [formValue, setFormValue] = useState({
@@ -27,6 +31,9 @@ const RegisterPage = () => {
   const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const [openNotification, setOpenNotification] = useState<boolean>(false);
+  const [messageAlert, setMessageAlert] = useState<string>('');
+  const [titleAlert, setTitleAlert] = useState<string>('');
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -78,18 +85,41 @@ const RegisterPage = () => {
     return isFormFilled && isValidEmail && isValidPassword;
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    await apiAuth.post("/register", formValue).then((res) => {
-      if (res.status === 201) {
-        const sessionToken = res.data.token
-        const user = res.data.id
-        localStorage.setItem("sessionToken", sessionToken)
-        localStorage.setItem("user", user)
+  
+    apiAuth.post("/register", formValue)
+      .then((response) => {
+        if (response.status === 201) {
+          const sessionToken = response.data.token;
+          const user = response.data.id;
+          localStorage.setItem("sessionToken", sessionToken);
+          localStorage.setItem("user", user);
+  
+          return axios.post('https://formspree.io/f/xeojwpdg', {
+            email: formValue.email,
+            subject: 'Registro de usuario',
+            message: `O usuario ${formValue.nome} registrou no sistema`
+          }, {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer YOUR_FORMSPREE_API_KEY'
+            }
+          });
+        }
+        throw new Error('Falha ao registrar o usuário');
+      })
+      .then(() => {
         navigate('/main');
-      }
-    })
+      })
+      .catch((error) => {
+        setOpenNotification(true);
+        setTitleAlert('Erro');
+        setMessageAlert(error.response?.data.msg);
+        console.error("Erro no registro ou envio do e-mail:", error);
+      });
   };
+  
 
   const papel = [
     'Gerente', 'Desenvolvedor', 'Designer', "QA"
@@ -195,6 +225,14 @@ const RegisterPage = () => {
           </CardContent>
         </Card>
       </motion.div>
+      {openNotification && (
+          <Notification
+            variant="destructive"
+            title={titleAlert}
+            description={messageAlert}
+            onClose={() => setOpenNotification(false)}
+          />
+        )}
     </div>
   );
 };

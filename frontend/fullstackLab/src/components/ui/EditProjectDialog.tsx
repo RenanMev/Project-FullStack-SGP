@@ -42,7 +42,6 @@ const EditProjectDialog: React.FC<EditProjectDialogProps> = ({ project, open, on
   const [editedProject, setEditedProject] = useState<Project | null>(null);
   const [usersToRemove, setUsersToRemove] = useState<number[]>([]);
   const [openAlertConfirm, setOpenAlertConfirm] = useState<boolean>(false);
-  console.log(selectedCollaborator)
   const fetchUsersInProject = (idProjects: number) => {
     api.get(`projetos/${idProjects}/usuarios`)
       .then(response => {

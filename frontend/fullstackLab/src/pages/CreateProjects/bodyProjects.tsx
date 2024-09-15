@@ -103,7 +103,6 @@ const BodyProjects: React.FC = () => {
         setTitleNotification('Erro');
         setDescriptionNotification('Houve um erro ao iniciar o projeto: ' + (err.response?.data?.msg || 'Erro desconhecido'));
         setOpenNotification(true);
-        console.log(err);
       });
   
     handleChange('alertOpen', false);

@@ -9,7 +9,7 @@ const RouteAuth: React.FC = () => {
 
   if (authenticated) {
     if (currentPath === "/" || currentPath === "/register") {
-      return <Navigate to="/projects" replace />;
+      return <Navigate to="/dashboard" replace />;
     }
   }
 

@@ -13,7 +13,6 @@ import { motion } from "framer-motion";
 import Logo from "../../assets/image/Logo/Logo Renan.svg";
 import { Link, useNavigate } from 'react-router-dom';
 import { apiAuth } from "@/axiosConfig";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"; // Importar componentes da biblioteca
 import Notification from "@/components/ui/notification";
 
 export const description =
@@ -77,7 +76,6 @@ const LoginPage = () => {
       }).catch((err) => {
 
         if(err.status === 401){
-          console.log(err)
           setOpenNotification(true);
           setMessageAlert(err.response.data.msg);
           setTitleAlert('Acesso negado');

@@ -8,6 +8,7 @@ import { Pencil, Users } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import { api } from '@/axiosConfig';
 import { useUser } from '@/context/UserContext';
+import { Navigate } from 'react-router-dom';
 
 const papels = ['Desenvolvedor', 'Designer', 'Gerente', 'Analista', 'QA'];
 
@@ -17,20 +18,40 @@ const Collaborators: React.FC = () => {
   const [collaborators, setCollaborators] = useState<{ id: number; nome: string; papel: string; email: string }[]>([]);
   const [editingCollaborator, setEditingCollaborator] = useState<{ id: number; nome: string; papel: string; email: string } | null>(null);
   const [temppapel, setTemppapel] = useState<string | undefined>(undefined);
+  const [redirect, setRedirect] = useState<boolean>(false);
+
+  const validUser = () => {
+    api.get(`/usuarios/${userData?.id}`)
+      .then(res => {
+        if (res.data.papel !== 'Gerente') {
+          setRedirect(true);
+        }
+      })
+      .catch(error => {
+        console.error('Erro ao buscar dados do usuário:', error);
+      });
+  };
 
   useEffect(() => {
+    if (userData) {
+      validUser();
+    }
+  }, [userData]);
+
+  useEffect(() => {
+    if (redirect) return;
     const fetchCollaborators = () => {
       api.get('/usuarios')
-        .then((res) => {
+        .then(res => {
           setCollaborators(res.data);
         })
-        .catch((err) => {
+        .catch(err => {
           console.error('Erro ao buscar colaboradores:', err);
         });
     };
 
     fetchCollaborators();
-  }, []);
+  }, [redirect]);
 
   const handleEdit = (collaborator: { id: number; nome: string; papel: string; email: string }) => {
     setEditingCollaborator(collaborator);
@@ -47,6 +68,10 @@ const Collaborators: React.FC = () => {
       setEditingCollaborator(null);
     }
   };
+
+  if (redirect) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <>

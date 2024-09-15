@@ -6,3 +6,9 @@ export interface Project {
   data_fim: string;
   status: 'Em andamento' | 'Concluído' | 'Pendente';
 }
+
+
+export interface ProjectChart {
+  dia: string; 
+  Projetos: number;
+}

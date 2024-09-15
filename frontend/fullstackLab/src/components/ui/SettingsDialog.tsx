@@ -35,7 +35,6 @@ const EditUserDialog: React.FC = () => {
   };
 
   const handleSave = () => {
-    console.log("User saved:", { userName, userEmail });
     toggleDialog();
   };
 

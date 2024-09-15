@@ -4,16 +4,16 @@ import CardProjects from '@/components/ui/CardProjects'
 import { useTheme } from '@/context/ThemeContext'
 import { ChartNoAxesGantt } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
-import { Project } from '@/types/projectsTypes' // Certifique-se de importar o tipo Project
+import { Project } from '@/types/projectsTypes' 
 
 const ProjectsList: React.FC = () => {
   const { darkMode } = useTheme()
-  const [listProjects, setListProjects] = useState<Project[]>([]) // Definido como um array de Project
+  const [listProjects, setListProjects] = useState<Project[]>([]) 
 
   const fetchListProjects = () => {
     api.get('/projetos')
       .then((res) => {
-        setListProjects(res.data) // Acessar dados da resposta
+        setListProjects(res.data)  
       })
       .catch((error) => {
         console.error('Erro ao buscar projetos:', error);
@@ -40,7 +40,7 @@ const ProjectsList: React.FC = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className='w-full overflow-x-auto'>
-            <CardProjects data={listProjects} /> {/* Passando a lista de projetos */}
+            <CardProjects data={listProjects} />
           </CardContent>
         </Card>
       </div>
