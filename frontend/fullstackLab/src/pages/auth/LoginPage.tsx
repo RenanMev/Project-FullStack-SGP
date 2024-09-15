@@ -13,7 +13,8 @@ import { motion } from "framer-motion";
 import Logo from "../../assets/image/Logo/Logo Renan.svg";
 import { Link, useNavigate } from 'react-router-dom';
 import { apiAuth } from "@/axiosConfig";
-
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"; // Importar componentes da biblioteca
+import Notification from "@/components/ui/notification";
 
 export const description =
   "Um formulário de login simples com email e senha. O botão de envio diz 'Entrar'.";
@@ -25,6 +26,9 @@ const LoginPage = () => {
   });
   const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [openNotification, setOpenNotification] = useState<boolean>(false);
+  const [messageAlert, setMessageAlert] = useState<string>('');
+  const [titleAlert, setTitleAlert] = useState<string>('');
 
   const navigate = useNavigate();
 
@@ -40,7 +44,7 @@ const LoginPage = () => {
       setEmailError(isValidEmail ? null : 'O email deve ser válido e terminar com ".com"');
     }
 
-    if (id === 'password') {
+    if (id === 'senha') {
       const isValidPassword = value.length >= 8;
       setPasswordError(isValidPassword ? null : 'A senha deve ter pelo menos 8 dígitos');
     }
@@ -63,14 +67,28 @@ const LoginPage = () => {
     if (isValidEmail && isValidPassword) {
       apiAuth.post('/login', formValue).then((res) => {
         if (res.status === 200) {
-          const sessionToken = res.data.token
-          const user = res.data.id
-          localStorage.setItem("sessionToken", sessionToken)
-          localStorage.setItem("user", user)
+          const sessionToken = res.data.token;
+          const user = res.data.id;
+          localStorage.setItem("sessionToken", sessionToken);
+          localStorage.setItem("user", user);
 
           navigate('/main');
         }
-      })
+      }).catch((err) => {
+
+        if(err.status === 401){
+          console.log(err)
+          setOpenNotification(true);
+          setMessageAlert(err.response.data.msg);
+          setTitleAlert('Acesso negado');
+        }
+        if(err.status === 500){
+          setOpenNotification(true);
+          setMessageAlert(err.response.data.msg);
+          setTitleAlert('Erro a acessar!');
+        }
+       
+      });
 
       setEmailError(null);
       setPasswordError(null);
@@ -137,7 +155,7 @@ const LoginPage = () => {
               </div>
               <div className="grid gap-2">
                 <div className="flex items-center">
-                  <Label htmlFor="password">Senha</Label>
+                  <Label htmlFor="senha">Senha</Label>
                   <Link to="/" className="ml-auto inline-block text-sm underline">
                     Esqueceu sua senha?
                   </Link>
@@ -181,6 +199,14 @@ const LoginPage = () => {
             </form>
           </CardContent>
         </Card>
+        {openNotification && (
+          <Notification
+            variant="destructive"
+            title={titleAlert}
+            description={messageAlert}
+            onClose={() => setOpenNotification(false)}
+          />
+        )}
       </motion.div>
     </div>
   );

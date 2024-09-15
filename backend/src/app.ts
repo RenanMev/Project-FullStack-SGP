@@ -20,6 +20,6 @@ app.use(express.json());
 
 app.use('/api/auth', router);
 app.use('/api/projetos', projectRoutes);
-app.use('/api/user', userRoutes);
+app.use('/api/', userRoutes);
 
 export default app;

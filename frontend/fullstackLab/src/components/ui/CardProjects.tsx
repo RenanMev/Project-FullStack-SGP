@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './card';
 import { Project } from '@/types/projectsTypes';
 import { Eye, Pencil } from 'lucide-react';
-import EditProjectDialog from './EditProjectDialog';
 import ViewProjectDialog from './ViewProjectDialog';
+import EditProjectDialog from './EditProjectDialog';
 
 interface CardProjectsProps {
   data: Project[];

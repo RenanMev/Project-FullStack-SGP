@@ -5,9 +5,9 @@ import { Project } from '@/types/projectsTypes';
 import { useTheme } from '@/context/ThemeContext';
 import { Input } from './input';
 import { Textarea } from './textarea';
-import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from './select';
 import { CalendarArrowUp } from 'lucide-react';
 import { Calendar } from './calendar';
+import { api } from '@/axiosConfig';
 
 interface EditProjectDialogProps {
   project: Project | null;
@@ -23,13 +23,10 @@ const EditProjectDialog: React.FC<EditProjectDialogProps> = ({ project, open, on
     startDate: undefined as Date | undefined,
     endDate: undefined as Date | undefined,
   });
-
-  const people = project?.collaborators || [];
   const [tempDates, setTempDates] = useState({
     tempStartDate: undefined as Date | undefined,
     tempEndDate: undefined as Date | undefined,
   });
-
   const [openDialogCalendar, setOpenDialogCalendar] = useState<boolean>(false);
   const [editedProject, setEditedProject] = useState<Project>(() => project || {
     id: 0,
@@ -38,18 +35,8 @@ const EditProjectDialog: React.FC<EditProjectDialogProps> = ({ project, open, on
     data_inicio: '',
     data_fim: '',
     status: 'Em andamento',
-    collaborators: [],
   });
 
-  useEffect(() => {
-    if (project) {
-      setEditedProject(project);
-      setDate({
-        startDate: project.data_inicio ? new Date(project.data_inicio) : undefined,
-        endDate: project.data_fim ? new Date(project.data_fim) : undefined,
-      });
-    }
-  }, [project]);
 
   const handleTempDateChange = (key: 'tempStartDate' | 'tempEndDate', date: Date | undefined) => {
     setTempDates(prev => ({
@@ -62,27 +49,39 @@ const EditProjectDialog: React.FC<EditProjectDialogProps> = ({ project, open, on
     setOpenDialogCalendar(prev => !prev);
   };
 
-  const handleSave = useCallback(() => {
-    if (tempDates.tempStartDate && tempDates.tempEndDate) {
-      if (tempDates.tempStartDate <= tempDates.tempEndDate) {
-        setDate({
-          startDate: tempDates.tempStartDate,
-          endDate: tempDates.tempEndDate,
-        });
-        setEditedProject(prev => ({
-          ...prev,
-          data_inicio: tempDates.tempStartDate ? tempDates.tempStartDate.toISOString().split('T')[0] : '',
-          data_fim: tempDates.tempEndDate ? tempDates.tempEndDate.toISOString().split('T')[0] : '',
-        }));
-        setOpenDialogCalendar(false);
-        onSave({
-          ...editedProject,
-          data_inicio: tempDates.tempStartDate.toISOString().split('T')[0],
-          data_fim: tempDates.tempEndDate.toISOString().split('T')[0],
-        });
-      }
+  const handleSaveDates = () => {
+    if (tempDates.tempStartDate && tempDates.tempEndDate && tempDates.tempStartDate <= tempDates.tempEndDate) {
+      setDate({
+        startDate: tempDates.tempStartDate,
+        endDate: tempDates.tempEndDate,
+      });
+      setEditedProject(prev => ({
+        ...prev,
+        data_inicio: tempDates.tempStartDate?.toISOString().split('T')[0] || '',
+        data_fim: tempDates.tempEndDate?.toISOString().split('T')[0] || '',
+      }));
+      setOpenDialogCalendar(false);
     }
-  }, [tempDates, onSave, editedProject]);
+  };
+
+  const handleSaveProject = useCallback(() => {
+    const updatedProject = {
+      ...editedProject,
+      data_inicio: date.startDate ? date.startDate.toISOString().split('T')[0] : '',
+      data_fim: date.endDate ? date.endDate.toISOString().split('T')[0] : '',
+    };
+
+    api.put(`projetos/${editedProject.id}`, updatedProject)
+      .then(res => {
+        if (res.status === 200) {
+          console.log(res);
+          onSave(updatedProject); 
+        }
+      })
+      .catch(error => {
+        console.error('Erro ao fazer a requisição:', error);
+      });
+  }, [editedProject, date, onSave]);
 
   const disabledCalendarSubmit = () => {
     return !tempDates.tempStartDate || !tempDates.tempEndDate || tempDates.tempStartDate > tempDates.tempEndDate;
@@ -117,30 +116,12 @@ const EditProjectDialog: React.FC<EditProjectDialogProps> = ({ project, open, on
                 <CalendarArrowUp />
               </div>
             </div>
-            <Select
-              onValueChange={(value) => setEditedProject(prev => ({
-                ...prev,
-                collaborators: people.filter(person => person.id === Number(value))
-              }))}
-              value={editedProject.collaborators.map(c => c.id.toString()).join(',')}
-            >
-              <SelectTrigger className='w-full'>
-                <SelectValue placeholder='Selecione o participante' />
-              </SelectTrigger>
-              <SelectContent>
-                {people.map((person) => (
-                  <SelectItem key={person.id} value={person.id.toString()}>
-                    {person.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
           <DialogFooter>
             <Button variant="destructive" onClick={() => onDelete(editedProject.id)}>
               Deletar
             </Button>
-            <Button onClick={handleSave}>Salvar</Button>
+            <Button onClick={handleSaveProject}>Salvar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -177,7 +158,7 @@ const EditProjectDialog: React.FC<EditProjectDialogProps> = ({ project, open, on
                 <Button variant='outline' className='mt-2' onClick={() => setOpenDialogCalendar(false)}>
                   Cancelar
                 </Button>
-                <Button className='mt-2' onClick={handleSave} disabled={disabledCalendarSubmit()}>
+                <Button className='mt-2' onClick={handleSaveDates} disabled={disabledCalendarSubmit()}>
                   Confirmar
                 </Button>
               </div>

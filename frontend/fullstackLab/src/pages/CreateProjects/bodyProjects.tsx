@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -8,21 +8,22 @@ import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle } 
 import { Calendar } from '@/components/ui/calendar';
 import { CalendarArrowUp, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-
-const people = [
-  { id: 1, name: 'João' },
-  { id: 2, name: 'Maria' },
-  { id: 3, name: 'Pedro' },
-];
+import { api } from '@/axiosConfig';
+import Notification from '@/components/ui/notification';
 
 const BodyProjects: React.FC = () => {
+  const [people, setPeople] = useState<{ id: number; nome: string; papel: string; email: string }[]>([]);
+  const [openNotification, setOpenNotification] = useState<boolean>(false);
+  const [titleNotification, setTitleNotification] = useState<string>('');
+  const [descriptionNotification, setDescriptionNotification] = useState<string>('');
+
   const [state, setState] = useState({
     projectName: '',
     projectDescription: '',
     startDate: undefined as Date | undefined,
     endDate: undefined as Date | undefined,
     responsible: undefined as number | undefined,
-    participants: [] as { id: number; name: string }[],
+    participants: [] as { id: number; nome: string }[],
     selectedParticipant: undefined as number | undefined,
     alertOpen: false,
     dialogCalendar: false,
@@ -79,17 +80,60 @@ const BodyProjects: React.FC = () => {
     }
   };
 
+  const resetValueForm = () => {
+    setState({
+      projectName: '',
+      projectDescription: '',
+      startDate: undefined,
+      endDate: undefined,
+      responsible: undefined,
+      participants: [],
+      selectedParticipant: undefined,
+      alertOpen: false,
+      dialogCalendar: false,
+    });
+  };
+
   const confirmStartProject = () => {
     const project = {
-      projectName: state.projectName,
-      projectDescription: state.projectDescription,
-      projectDeadline: { startDate: state.startDate, endDate: state.endDate },
-      participants: state.participants,
-      responsible: people.find(p => p.id === state.responsible)?.name,
+      usuario_id: state.responsible,
+      nome: state.projectName,
+      descricao: state.projectDescription,
+      data_inicio: state.startDate,
+      data_fim: state.endDate,
+      status: 'Em andamento',
     };
-    console.log(project);
+  
+    let idProject: number;
+  
+    api.post('projetos', project)
+      .then((res) => {
+        idProject = res.data.id;
+        
+        const participantsPromises = state.participants.map((participant) => {
+          return api.post(`/projetos/${idProject}/usuarios`, {
+            usuario_id: participant.id,
+          });
+        });
+  
+        return Promise.all(participantsPromises);
+      })
+      .then(() => {
+        setTitleNotification('Projeto iniciado');
+        setDescriptionNotification('O projeto foi iniciado com sucesso.');
+        setOpenNotification(true);
+        resetValueForm();
+      })
+      .catch((err) => {
+        setTitleNotification('Erro');
+        setDescriptionNotification('Houve um erro ao iniciar o projeto: ' + (err.response?.data?.msg || 'Erro desconhecido'));
+        setOpenNotification(true);
+        console.log(err);
+      });
+  
     handleChange('alertOpen', false);
   };
+  
 
   const saveDates = () => {
     handleChange('startDate', tempDates.tempStartDate);
@@ -97,6 +141,19 @@ const BodyProjects: React.FC = () => {
     handleChange('dialogCalendar', false);
   };
 
+  useEffect(() => {
+    const fetchCollaborators = () => {
+      api.get('/usuarios')
+        .then((res) => {
+          setPeople(res.data);
+        })
+        .catch((err) => {
+          console.error('Erro ao buscar colaboradores:', err);
+        });
+    };
+
+    fetchCollaborators();
+  }, []);
   return (
     <>
       <Card className='flex-1 overflow-hidden'>
@@ -146,7 +203,7 @@ const BodyProjects: React.FC = () => {
                   <SelectContent>
                     {people.map((person) => (
                       <SelectItem key={person.id} value={person.id.toString()}>
-                        {person.name}
+                        {person.nome}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -160,7 +217,7 @@ const BodyProjects: React.FC = () => {
               <div className='flex gap-4'>
                 {state.participants.map((participant) => (
                   <div key={participant.id} className='flex items-center gap-2 justify-center hover:bg-white rounded-full hover:text-neutral-950 px-2 font-bold'>
-                    <span>{participant.name}</span>
+                    <span>{participant.nome}</span>
                     <div className='w-4 h-4 rounded-full items-center flex cursor-pointer' onClick={() => removeParticipant(participant.id)}>
                       <X />
                     </div>
@@ -236,6 +293,17 @@ const BodyProjects: React.FC = () => {
           </div>
         </AlertDialogContent>
       </AlertDialog>
+
+
+      {openNotification &&
+        <Notification
+          variant='default'
+          title={titleNotification}
+          description={descriptionNotification}
+          onClose={() => setOpenNotification(false)}
+        />
+      }
+
     </>
   );
 };

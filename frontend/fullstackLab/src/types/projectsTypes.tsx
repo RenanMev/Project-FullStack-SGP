@@ -5,8 +5,4 @@ export interface Project {
   data_inicio: string;
   data_fim: string;
   status: 'Em andamento' | 'Concluído' | 'Pendente';
-  collaborators: {
-    id: number;
-    name: string;
-  }[];
 }

@@ -2,7 +2,6 @@ import { useTheme } from '@/context/ThemeContext'
 import { CircleFadingPlus } from 'lucide-react'
 import React from 'react'
 import BodyProjects from './bodyProjects'
-import { Input } from '@/components/ui/input'
 
 
 const CreateProjects: React.FC = () => {

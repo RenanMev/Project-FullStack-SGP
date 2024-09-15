@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -6,43 +6,42 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Pencil, Users } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
+import { api } from '@/axiosConfig';
+import { useUser } from '@/context/UserContext';
 
-const initialCollaborators = [
-  { id: 1, name: 'João', role: 'Desenvolvedor' },
-  { id: 2, name: 'Maria', role: 'Designer' },
-  { id: 3, name: 'Pedro', role: 'Gerente' },
-  { id: 3, name: 'Pedro', role: 'Gerente' },
-  { id: 3, name: 'Pedro', role: 'Gerente' },
-  { id: 3, name: 'Pedro', role: 'Gerente' },
-  { id: 3, name: 'Pedro', role: 'Gerente' },
-  { id: 3, name: 'Pedro', role: 'Gerente' },
-  { id: 3, name: 'Pedro', role: 'Gerente' },
-  { id: 3, name: 'Pedro', role: 'Gerente' },
-  { id: 3, name: 'Pedro', role: 'Gerente' },
-  { id: 3, name: 'Pedro', role: 'Gerente' },
-  { id: 3, name: 'Pedro', role: 'Gerente' },
-  { id: 3, name: 'Pedro', role: 'Gerente' },
-];
-
-const roles = ['Desenvolvedor', 'Designer', 'Gerente', 'Analista', 'QA'];
+const papels = ['Desenvolvedor', 'Designer', 'Gerente', 'Analista', 'QA'];
 
 const Collaborators: React.FC = () => {
-  const darkMode = useTheme()
-  const [collaborators, setCollaborators] = useState(initialCollaborators);
-  const [editingCollaborator, setEditingCollaborator] = useState<{ id: number; name: string; role: string } | null>(null);
+  const darkMode = useTheme();
+  const { userData } = useUser();
+  const [collaborators, setCollaborators] = useState<{ id: number; nome: string; papel: string; email: string }[]>([]);
+  const [editingCollaborator, setEditingCollaborator] = useState<{ id: number; nome: string; papel: string; email: string } | null>(null);
+  const [temppapel, setTemppapel] = useState<string | undefined>(undefined);
 
-  const [tempRole, setTempRole] = useState<string | undefined>(undefined);
+  useEffect(() => {
+    const fetchCollaborators = () => {
+      api.get('/usuarios')
+        .then((res) => {
+          setCollaborators(res.data);
+        })
+        .catch((err) => {
+          console.error('Erro ao buscar colaboradores:', err);
+        });
+    };
 
-  const handleEdit = (collaborator: { id: number; name: string; role: string }) => {
+    fetchCollaborators();
+  }, []);
+
+  const handleEdit = (collaborator: { id: number; nome: string; papel: string; email: string }) => {
     setEditingCollaborator(collaborator);
-    setTempRole(collaborator.role);
+    setTemppapel(collaborator.papel);
   };
 
   const handleSave = () => {
-    if (editingCollaborator && tempRole) {
+    if (editingCollaborator && temppapel) {
       setCollaborators(prevCollaborators =>
         prevCollaborators.map(c =>
-          c.id === editingCollaborator.id ? { ...c, role: tempRole } : c
+          c.id === editingCollaborator.id ? { ...c, papel: temppapel } : c
         )
       );
       setEditingCollaborator(null);
@@ -51,7 +50,7 @@ const Collaborators: React.FC = () => {
 
   return (
     <>
-      <div className='w-full bg-neutral-950 h-screen '>
+      <div className='w-full bg-neutral-950 h-screen'>
         <Card className='w-full h-full overflow-auto'>
           <CardHeader>
             <CardTitle className='flex items-center gap-2'>
@@ -68,10 +67,16 @@ const Collaborators: React.FC = () => {
               {collaborators.map((collaborator) => (
                 <div key={collaborator.id} className='flex justify-between items-center p-2 border rounded-md'>
                   <div>
-                    <p>{collaborator.name}</p>
-                    <p className='text-sm text-neutral-500'>{collaborator.role}</p>
+                    <p className='font-semibold'>{collaborator.nome}</p>
+                    <p className='text-sm text-neutral-500'>{collaborator.papel}</p>
+                    <p className='text-sm text-neutral-500'>{collaborator.email}</p>
                   </div>
-                  <Button onClick={() => handleEdit(collaborator)} variant='outline' className='flex items-center'>
+                  <Button
+                    onClick={() => handleEdit(collaborator)}
+                    variant='outline'
+                    className='flex items-center'
+                    aria-label={`Editar ${collaborator.nome}`}
+                  >
                     <Pencil className='mr-2' size={16} /> Editar
                   </Button>
                 </div>
@@ -80,36 +85,60 @@ const Collaborators: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Dialog open={editingCollaborator !== null} onOpenChange={() => setEditingCollaborator(null)}>
-          <DialogContent className={`${darkMode ? "bg-neutral-950 text-white" : "bg-white text-black"} min-w-96`}>
+        <Dialog
+          open={editingCollaborator !== null}
+          onOpenChange={() => setEditingCollaborator(null)}
+        >
+          <DialogContent
+            className={`${darkMode ? "bg-neutral-950 text-white" : "bg-white text-black"} min-w-[400px]`}
+          >
             <DialogHeader>
               <DialogTitle>Editar Colaborador</DialogTitle>
             </DialogHeader>
             <div className='space-y-4'>
               <div>
-                <p>Nome</p>
-                <Input value={editingCollaborator?.name} readOnly />
+                <p className='pt-2 mb-3'>Nome</p>
+                <Input value={editingCollaborator?.nome} readOnly />
               </div>
-              <div>
-                <p>Cargo</p>
-                <Select onValueChange={(value) => setTempRole(value)} value={tempRole}>
+              <div >
+                <p className='pt-2 mb-3'>Cargo</p>
+                <Select
+                  onValueChange={(value) => setTemppapel(value)}
+                  value={temppapel}
+                  aria-label='Selecione o cargo'
+                >
                   <SelectTrigger className='w-full'>
                     <SelectValue placeholder='Selecione o cargo' />
                   </SelectTrigger>
                   <SelectContent>
-                    {roles.map((role) => (
-                      <SelectItem key={role} value={role}>
-                        {role}
+                    {papels.map((papel) => (
+                      <SelectItem key={papel} value={papel}>
+                        {papel}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
+              <div className='pb-6'>
+                <p className='pt-2 mb-3'>Email</p>
+                <Input disabled={userData?.papel === 'Gerente' ? false : true} value={editingCollaborator?.email} readOnly />
+              </div>
               <div className='flex justify-end gap-4'>
-                <Button variant='outline' className={`${darkMode ? "bg-neutral-950 text-white" : "bg-white text-black"}`} onClick={() => setEditingCollaborator(null)}>
+                <Button
+                  variant='outline'
+                  className={`${darkMode ? "bg-neutral-950 text-white" : "bg-white text-black"}`}
+                  onClick={() => setEditingCollaborator(null)}
+                  aria-label='Cancelar edição'
+                >
                   Cancelar
                 </Button>
-                <Button variant='outline' onClick={handleSave} className={`${darkMode ? "bg-neutral-950 text-white" : "bg-white text-black"}`} disabled={!tempRole}>
+                <Button
+                  variant='outline'
+                  onClick={handleSave}
+                  className={`${darkMode ? "bg-neutral-950 text-white" : "bg-white text-black"}`}
+                  disabled={!temppapel}
+                  aria-label='Salvar alterações'
+                >
                   Salvar
                 </Button>
               </div>
