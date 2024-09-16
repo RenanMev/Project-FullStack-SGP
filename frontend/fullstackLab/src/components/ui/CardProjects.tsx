@@ -32,7 +32,7 @@ const CardProjects: React.FC<CardProjectsProps> = ({ data }) => {
 
   const handleDeleteProject = (id: number) => {
     api.delete(`/projetos/${id}`)
-      .then(res => {
+      .then(() => {
         setTitleAlert('Deletar');
         setMessageAlert('Projeto deletado com sucesso!');
         setOpenNotification(true);
@@ -54,7 +54,7 @@ const CardProjects: React.FC<CardProjectsProps> = ({ data }) => {
 
     if (idColaboradores && idColaboradores > 0) {
       await api.post(`/projetos/${updatedProject.id}/usuarios`, { usuario_id: idColaboradores })
-        .then((res) => {
+        .then(() => {
           userChangeSucess = true;
         })
         .catch((err) => {
@@ -100,67 +100,68 @@ const CardProjects: React.FC<CardProjectsProps> = ({ data }) => {
 
 
   return (
-    <div className="flex gap-8 p-4">
-      {data.map((project) => (
-        <Card key={project.id} className='max-w-96 min-w-80'>
-          <CardHeader>
-            <CardTitle>
-              <h3>{project.nome}</h3>
-            </CardTitle>
-            <CardDescription>
-              <p>{project.descricao}</p>
-            </CardDescription>
-          </CardHeader>
-          <CardContent className='max-w-80 overflow-auto'>
-            <div className='flex justify-between'>
-              <div className='flex flex-col'>
-                <p>{new Date(project.data_inicio).toLocaleDateString()}</p>
-                <p>{new Date(project.data_fim).toLocaleDateString()}</p>
-                <p>Status: {project.status}</p>
+    <div className="flex flex-wrap gap-8 p-4">
+    {data.map((project) => (
+      <Card key={project.id} className='max-w-96 min-w-72 flex-shrink-0'>
+        <CardHeader>
+          <CardTitle>
+            <h3>{project.nome}</h3>
+          </CardTitle>
+          <CardDescription>
+            <p>{project.descricao}</p>
+          </CardDescription>
+        </CardHeader>
+        <CardContent className='max-w-80 '>
+          <div className='flex justify-between'>
+            <div className='flex flex-col'>
+              <p>{new Date(project.data_inicio).toLocaleDateString()}</p>
+              <p>{new Date(project.data_fim).toLocaleDateString()}</p>
+              <p>Status: {project.status}</p>
+            </div>
+            <div className='ml-8 gap-2 flex-col'>
+              <div
+                className='cursor-pointer hover:bg-stone-50 m-2 hover:text-black rounded-full p-1 w-10 h-10 flex justify-center items-center'
+                onClick={() => handleEditClick(project)}
+              >
+                <Pencil />
               </div>
-              <div className='gap-2 flex-col'>
-                <div
-                  className='cursor-pointer hover:bg-stone-50 m-2 hover:text-black rounded-full p-1 w-10 h-10 justify-center items-center flex'
-                  onClick={() => handleEditClick(project)}
-                >
-                  <Pencil />
-                </div>
-                <div
-                  className='cursor-pointer hover:bg-stone-50 m-2 hover:text-black rounded-full p-1 w-10 h-10 justify-center items-center flex'
-                  onClick={() => handleViewClick(project)}
-                >
-                  <Eye />
-                </div>
+              <div
+                className='cursor-pointer hover:bg-stone-50 m-2 hover:text-black rounded-full p-1 w-10 h-10 flex justify-center items-center'
+                onClick={() => handleViewClick(project)}
+              >
+                <Eye />
               </div>
             </div>
-          </CardContent>
-        </Card>
-      ))}
-
-      <EditProjectDialog
-        collaborators={collaborators}
-        project={selectedProject}
-        open={openEditDialog}
-        onClose={() => setOpenEditDialog(false)}
-        onDelete={handleDeleteProject}
-        onSave={handleSaveProject}
+          </div>
+        </CardContent>
+      </Card>
+    ))}
+  
+    <EditProjectDialog
+      collaborators={collaborators}
+      project={selectedProject}
+      open={openEditDialog}
+      onClose={() => setOpenEditDialog(false)}
+      onDelete={handleDeleteProject}
+      onSave={handleSaveProject}
+    />
+  
+    <ViewProjectDialog
+      project={selectedProject}
+      open={openViewDialog}
+      onClose={() => setOpenViewDialog(false)}
+    />
+  
+    {openNotification && (
+      <Notification
+        variant="default"
+        title={titleAlert}
+        description={messageAlert}
+        onClose={() => setOpenNotification(false)}
       />
-
-      <ViewProjectDialog
-        project={selectedProject}
-        open={openViewDialog}
-        onClose={() => setOpenViewDialog(false)}
-      />
-
-      {openNotification && (
-        <Notification
-          variant="default"
-          title={titleAlert}
-          description={messageAlert}
-          onClose={() => setOpenNotification(false)}
-        />
-      )}
-    </div>
+    )}
+  </div>
+  
   );
 };
 

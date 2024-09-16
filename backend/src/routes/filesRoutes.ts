@@ -1,8 +1,8 @@
 import express from 'express';
 import { addFileProjects } from '../controllers/addFileProjects';
 
-const routerFlie = express.Router();
+const router = express.Router();
 
-routerFlie.post('/projectfile', addFileProjects)
+router.post('/projectfile', addFileProjects);
 
-export default routerFlie;
+export default router;

@@ -7,8 +7,8 @@ interface ProjectAttributes {
   nome: string;
   descricao?: string;
   data_inicio: Date;
-  data_fim?: Date;
-  status: string;
+  data_fim?: Date | null;
+  status: string | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -59,7 +59,7 @@ Project.init(
     sequelize,
     modelName: 'Project',
     tableName: 'projetos',
-    timestamps: false,
+    timestamps: false, 
   }
 );
 
