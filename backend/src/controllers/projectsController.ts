@@ -193,7 +193,35 @@ export const removeUserFromProject = async (req: Request, res: Response): Promis
   }
 };
 
+export const getUserProjects = async (req: Request, res: Response): Promise<Response> => {
+  const userId = parseInt(req.params.usuarioId);
 
+  if (isNaN(userId)) {
+    return res.status(400).json({ error: 'ID de usuário inválido.' });
+  }
+
+  try {
+    const projetosUsuarios = await ProjetosUsuarios.findAll({
+      where: { usuario_id: userId },
+      attributes: ['projeto_id']
+    });
+
+    if (projetosUsuarios.length === 0) {
+      return res.status(404).json({ mensagem: 'Nenhum projeto vinculado ao usuário encontrado.' });
+    }
+
+    const projetosIds = projetosUsuarios.map(pu => pu.projeto_id);
+
+    const projetos = await Projeto.findAll({
+      where: { id: projetosIds }
+    });
+
+    return res.status(200).json(projetos);
+  } catch (error) {
+    console.error('Erro ao buscar projetos do usuário:', error);
+    return res.status(500).json({ error: 'Erro ao buscar projetos do usuário.', msg: (error as Error).message });
+  }
+};
 
 
 

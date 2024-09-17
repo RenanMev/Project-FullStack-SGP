@@ -1,4 +1,4 @@
-import * as React from "react"
+import react, { useEffect, useState } from "react"
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
 
 import {
@@ -32,10 +32,10 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function GraphComponent() {
-  const [timeRange, setTimeRange] = React.useState("90d")
-  const [filteredData, setFilteredData] = React.useState<ProjectChart[]>([])
+  const [timeRange, setTimeRange] = useState("90d")
+  const [filteredData, setFilteredData] = useState<ProjectChart[]>([])
 
-  React.useEffect(() => {
+  useEffect(() => {
     api.get<Project[]>('/projetos')
       .then(res => {
         const contadorPorDia: Record<string, number> = {}
@@ -136,17 +136,7 @@ export function GraphComponent() {
             <YAxis />
             <ChartTooltip
               cursor={false}
-              content={
-                <ChartTooltipContent
-                  labelFormatter={(value) => {
-                    return new Date(value).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    })
-                  }}
-                  indicator="dot"
-                />
-              }
+              content={<ChartTooltipContent indicator="dot" />}
             />
             <Area
               dataKey="Projetos"

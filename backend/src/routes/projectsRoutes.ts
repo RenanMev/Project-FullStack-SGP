@@ -4,6 +4,7 @@ import {
   addUserToProject,
   deleteProjects,
   editProjects,
+  getUserProjects,
   ListAllProjects,
   listUserinProjects,
   registerProjects,
@@ -19,5 +20,6 @@ router.delete('/:id', authenticateJWT, deleteProjects);
 router.get('/:projetoId/usuarios', authenticateJWT, listUserinProjects);
 router.post('/:projetoId/usuarios', authenticateJWT, addUserToProject);
 router.delete('/:projetoId/usuarios/:usuarioId', authenticateJWT, removeUserFromProject);
+router.get('/:usuarioId', authenticateJWT, getUserProjects);
 
 export default router;

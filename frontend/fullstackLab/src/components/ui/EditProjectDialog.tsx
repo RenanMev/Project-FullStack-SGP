@@ -64,7 +64,7 @@ const EditProjectDialog: React.FC<EditProjectDialogProps> = ({ project, open, on
       const endDate = project.data_fim ? new Date(project.data_fim) : undefined;
       setDate({ startDate, endDate });
       setTempDates({ tempStartDate: startDate, tempEndDate: endDate });
-      setStatus(project.status ?? "Pendente"); // Usa "Pendente" como fallback
+      setStatus(project.status ?? "Pendente"); 
       fetchUsersInProject(project.id);
     }
   }, [project]);
@@ -109,6 +109,8 @@ const EditProjectDialog: React.FC<EditProjectDialogProps> = ({ project, open, on
       api.delete(`/projetos/${project?.id}/usuarios/${userId}`)
     ))
       .then(() => {
+        setSelectedUserInProjects([])
+        setSelectedCollaborator(null)
         setUsersToRemove([]);
         if (project) {
           fetchUsersInProject(project.id);

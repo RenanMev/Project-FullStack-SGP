@@ -1,4 +1,3 @@
-
 import  { useEffect, useState } from 'react';
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import {
@@ -20,7 +19,7 @@ import { Project, ProjectChart } from '@/types/projectsTypes';
 const chartConfig = {
   projects: {
     label: "Projetos",
-    color: "hsl(var(--chart-2))",
+    color: "hsl(var(--chart-1))",
   },
 } satisfies ChartConfig
 
@@ -59,25 +58,31 @@ export function CharProjects() {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle> Data de Início</CardTitle>
-        <CardDescription>
-          Mostrando a quantidade de projetos por data de início
-        </CardDescription>
+      <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
+        <div className="grid flex-1 gap-1 text-center sm:text-left">
+          <CardTitle>Data de Início</CardTitle>
+          <CardDescription>
+            Mostrando a quantidade de projetos por data de início
+          </CardDescription>
+        </div>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig}>
-          <AreaChart
-            accessibilityLayer
-            data={dadosDoGrafico}
-            margin={{
-              left: 12,
-              right: 12,
-              top: 24,
-              bottom: 24
-            }}
-            width={window.innerWidth * 0.9}
-          >
+      <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
+        <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
+          <AreaChart data={dadosDoGrafico}>
+            <defs>
+              <linearGradient id="fillProjects" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-projects)"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-projects)"
+                  stopOpacity={0.1}
+                />
+              </linearGradient>
+            </defs>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="dia"
@@ -93,18 +98,15 @@ export function CharProjects() {
               content={<ChartTooltipContent indicator="dot" />}
             />
             <Area
-               dataKey="Projetos"
-               type="monotone"
-               fill={chartConfig.projects.color}
-               fillOpacity={0.3}
-               stroke={chartConfig.projects.color}
-               strokeWidth={2}
-               stackId="a"
+              dataKey="Projetos"
+              type="natural"
+              fill="url(#fillProjects)"
+              stroke="var(--color-projects)" 
+              stackId="a"
             />
           </AreaChart>
         </ChartContainer>
       </CardContent>
-      
     </Card>
   );
 }

@@ -1,4 +1,4 @@
-import * as React from "react"
+import react, { useEffect } from "react"
 import ReactDOM from "react-dom"
 import { Alert, AlertTitle, AlertDescription } from "./alert"
 import '../styleComponents/notification.css'
@@ -9,7 +9,7 @@ const Notification = ({ variant, title, description, onClose }: {
   description?: string
   onClose: () => void
 }) => {
-  React.useEffect(() => {
+  useEffect(() => {
     const timer = setTimeout(() => {
       onClose()
     }, 6000)
