@@ -37,7 +37,6 @@ export const GraphComponentFilter = () => {
   const [filteredData, setFilteredData] = useState<ProjectChart[]>([]);
   const [users, setUsers] = useState<any[]>([]);
 
-  // Buscar todos os usuários
   useEffect(() => {
     api.get('/usuarios')
       .then(res => {
@@ -48,7 +47,6 @@ export const GraphComponentFilter = () => {
       });
   }, []);
 
-  // Buscar projetos de todos os usuários
   useEffect(() => {
     api.get<Project[]>('/projetos')
       .then(res => {
@@ -78,9 +76,8 @@ export const GraphComponentFilter = () => {
       });
   }, []);
 
-  // Buscar projetos de um usuário específico
   useEffect(() => {
-    if (!selectedUser) return; // Não buscar se nenhum usuário foi selecionado
+    if (!selectedUser) return; 
 
     api.get<Project[]>(`/projetos/${selectedUser}`)
       .then(res => {
@@ -110,7 +107,6 @@ export const GraphComponentFilter = () => {
       });
   }, [selectedUser]);
 
-  // Atualizar os dados filtrados com base na seleção do usuário
   useEffect(() => {
     setFilteredData(selectedUser ? userProjects : allProjects);
   }, [selectedUser, allProjects, userProjects]);
