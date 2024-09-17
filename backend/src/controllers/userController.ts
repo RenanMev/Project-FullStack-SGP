@@ -14,7 +14,37 @@ export const getAllUsers = async (req: Request, res: Response) => {
   }
 };
 
+export const editUser = async (req: Request, res: Response) => {
+  try {
+    const userId = Number(req.params.userId);
+    const { nome, email, papel } = req.body;
 
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res.status(404).json({ msg: 'Usuário não encontrado' });
+    }
+
+    user.nome = nome || user.nome;
+    user.email = email || user.email;
+    user.papel = papel || user.papel;
+
+    await user.save();
+
+    res.json({
+      id: user.id,
+      nome: user.nome,
+      email: user.email,
+      papel: user.papel
+    });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res.status(500).json({ msg: 'Erro ao editar usuário', error: error.message });
+    } else {
+      res.status(500).json({ msg: 'Erro desconhecido ao editar usuário' });
+    }
+  }
+};
 
 export const getUser = async (req: Request, res: Response) => {
   try {
@@ -40,4 +70,3 @@ export const getUser = async (req: Request, res: Response) => {
     }
   }
 };
-

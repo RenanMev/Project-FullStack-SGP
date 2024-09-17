@@ -20,7 +20,7 @@ import { Project, ProjectChart } from '@/types/projectsTypes';
 const chartConfig = {
   projects: {
     label: "Projetos",
-    color: "hsl(var(--chart-1))",
+    color: "hsl(var(--chart-2))",
   },
 } satisfies ChartConfig
 

@@ -5,15 +5,14 @@ import { Readable } from 'stream';
 import Projeto from '../models/Projeto';
 
 interface ProjetoCSV {
-  id: string; // ID como string no CSV
+  id: string;
   nome: string;
-  descricao?: string; // Descrição pode ser opcional
-  data_inicio: string; // Data como string no CSV
-  data_fim?: string; // Opcional, data como string no CSV
+  descricao?: string;
+  data_inicio: string;
+  data_fim?: string;
   status: string;
 }
 
-// Configuração do multer para armazenamento em memória
 const storage = multer.memoryStorage();
 
 const upload = multer({
@@ -57,7 +56,6 @@ export const addFileProjects = (req: Request, res: Response): void => {
           const data_fim = data.data_fim ? data.data_fim.trim() : undefined;
           const status = data.status.trim() || undefined;
 
-          // Verificar se a data é válida antes de converter
           const parseDate = (dateString: string) => {
             const date = new Date(dateString);
             return isNaN(date.getTime()) ? undefined : date;
@@ -66,7 +64,6 @@ export const addFileProjects = (req: Request, res: Response): void => {
           const data_inicio_date = parseDate(data_inicio);
           const data_fim_date = data_fim ? parseDate(data_fim) : undefined;
 
-          // Verificar se o ID e o nome são válidos e adicionar ao array de resultados
           if (!isNaN(id) && nome && status) {
             results.push({
               id,
@@ -89,11 +86,11 @@ export const addFileProjects = (req: Request, res: Response): void => {
         try {
           for (const project of results) {
             await Projeto.upsert({
-              id: project.id as number, // ID como number
+              id: project.id as number,  
               nome: project.nome as string,
               descricao: project.descricao as string | undefined,
-              data_inicio: project.data_inicio as Date, // Data como Date ou undefined
-              data_fim: project.data_fim as Date | undefined, // Data como Date ou undefined
+              data_inicio: project.data_inicio as Date, 
+              data_fim: project.data_fim as Date | undefined, 
               status: project.status as string | undefined
             });
           }

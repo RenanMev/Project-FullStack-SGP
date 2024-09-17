@@ -120,13 +120,13 @@ const CardProjects: React.FC<CardProjectsProps> = ({ data }) => {
             </div>
             <div className='ml-8 gap-2 flex-col'>
               <div
-                className='cursor-pointer hover:bg-stone-50 m-2 hover:text-black rounded-full p-1 w-10 h-10 flex justify-center items-center'
+                className='cursor-pointer hover:bg-stone-50 m-2 hover:text-black rounded-full p-1 w-7 h-7 flex justify-center items-center'
                 onClick={() => handleEditClick(project)}
               >
                 <Pencil />
               </div>
               <div
-                className='cursor-pointer hover:bg-stone-50 m-2 hover:text-black rounded-full p-1 w-10 h-10 flex justify-center items-center'
+                className='cursor-pointer hover:bg-stone-50 m-2 hover:text-black rounded-full p-1 w-7 h-7 flex justify-center items-center'
                 onClick={() => handleViewClick(project)}
               >
                 <Eye />

@@ -31,6 +31,9 @@ interface EditProjectDialogProps {
   collaborators: Array<Collaborator>;
 }
 
+const STATUS_OPTIONS = ["Pendente", "Em andamento", "Concluído"] as const;
+type Status = typeof STATUS_OPTIONS[number];
+
 const EditProjectDialog: React.FC<EditProjectDialogProps> = ({ project, open, onClose, onDelete, onSave, collaborators }) => {
   const darkMode = useTheme();
 
@@ -42,6 +45,8 @@ const EditProjectDialog: React.FC<EditProjectDialogProps> = ({ project, open, on
   const [editedProject, setEditedProject] = useState<Project | null>(null);
   const [usersToRemove, setUsersToRemove] = useState<number[]>([]);
   const [openAlertConfirm, setOpenAlertConfirm] = useState<boolean>(false);
+  const [status, setStatus] = useState<Status>("Pendente");
+
   const fetchUsersInProject = (idProjects: number) => {
     api.get(`projetos/${idProjects}/usuarios`)
       .then(response => {
@@ -59,6 +64,7 @@ const EditProjectDialog: React.FC<EditProjectDialogProps> = ({ project, open, on
       const endDate = project.data_fim ? new Date(project.data_fim) : undefined;
       setDate({ startDate, endDate });
       setTempDates({ tempStartDate: startDate, tempEndDate: endDate });
+      setStatus(project.status ?? "Pendente"); // Usa "Pendente" como fallback
       fetchUsersInProject(project.id);
     }
   }, [project]);
@@ -92,10 +98,11 @@ const EditProjectDialog: React.FC<EditProjectDialogProps> = ({ project, open, on
   const handleSaveProject = useCallback(() => {
     if (!editedProject) return;
 
-    const updatedProject = {
+    const updatedProject: Project = {
       ...editedProject,
       data_inicio: date.startDate ? date.startDate.toISOString().split('T')[0] : '',
       data_fim: date.endDate ? date.endDate.toISOString().split('T')[0] : '',
+      status,
     };
 
     Promise.all(usersToRemove.map(userId =>
@@ -113,14 +120,13 @@ const EditProjectDialog: React.FC<EditProjectDialogProps> = ({ project, open, on
 
     onSave(updatedProject, selectedCollaborator ? Number(selectedCollaborator.id) : 0);
 
-  }, [editedProject, date, selectedCollaborator, onSave, usersToRemove, project?.id]);
+  }, [editedProject, date, selectedCollaborator, onSave, usersToRemove, project?.id, status]);
 
   const handleMarkUserForRemoval = (userId: number) => {
     setUsersToRemove(prev => [...prev, userId]);
 
     setSelectedUserInProjects(prev => prev.filter(user => user.id !== userId));
   };
-
 
   const disabledCalendarSubmit = () => {
     return !tempDates.tempStartDate || !tempDates.tempEndDate || tempDates.tempStartDate > tempDates.tempEndDate;
@@ -176,6 +182,21 @@ const EditProjectDialog: React.FC<EditProjectDialogProps> = ({ project, open, on
               </SelectContent>
             </Select>
 
+            <Select
+              value={status}
+              onValueChange={(value) => setStatus(value as Status)}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Selecione o status" />
+              </SelectTrigger>
+              <SelectContent>
+                {STATUS_OPTIONS.map(option => (
+                  <SelectItem key={option} value={option}>
+                    {option}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
             <div>
               <h3>Usuários no Projeto:</h3>

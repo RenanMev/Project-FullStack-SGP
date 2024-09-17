@@ -42,7 +42,7 @@ export const registerProjects = async (req: Request, res: Response): Promise<Res
 };
 
 export const editProjects = async (req: Request, res: Response): Promise<Response> => {
-  const id = parseInt(req.params.id, 10);
+  const id = parseInt(req.params.userId);
   const { nome, descricao, data_inicio, data_fim, status } = req.body;
 
   if (isNaN(id)) {

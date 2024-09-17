@@ -58,8 +58,13 @@ const Collaborators: React.FC = () => {
     setTemppapel(collaborator.papel);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    debugger
     if (editingCollaborator && temppapel) {
+      await api.put(`/edituser/${editingCollaborator.id}`,editingCollaborator )
+      .then((res)=>{
+        console.log(res)
+      })
       setCollaborators(prevCollaborators =>
         prevCollaborators.map(c =>
           c.id === editingCollaborator.id ? { ...c, papel: temppapel } : c
