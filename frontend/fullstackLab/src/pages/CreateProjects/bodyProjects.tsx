@@ -2,11 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Calendar } from '@/components/ui/calendar';
-import { CalendarArrowUp, X } from 'lucide-react';
+import { CalendarArrowUp } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { api } from '@/axiosConfig';
 import Notification from '@/components/ui/notification';
@@ -90,7 +89,6 @@ const BodyProjects: React.FC = () => {
       status: 'Em andamento',
     };
   
-    let idProject: number;
   
     api.post('projetos', project)
       .then(() => {
@@ -151,7 +149,7 @@ const BodyProjects: React.FC = () => {
             </div>
             <div className='w-full mb-6'>
               <p className='pb-2'>Especifique o prazo do projeto</p>
-              <div className='flex border border-neutral-700 rounded-xl p-2 gap-4' onClick={() => handleChange('dialogCalendar', !state.dialogCalendar)}>
+              <Button variant='outline'  className='flex border justify-end border-secondary rounded-xl p-2 gap-4 min-w-72' onClick={() => handleChange('dialogCalendar', !state.dialogCalendar)}>
                 {state.startDate && state.endDate && (
                   <div>
                     {state.startDate.toDateString()} - {state.endDate.toDateString()}
@@ -160,7 +158,7 @@ const BodyProjects: React.FC = () => {
                 <div>
                   <CalendarArrowUp />
                 </div>
-              </div>
+              </Button>
             </div>
           </div>
           <div className='w-full p-5 mt-4'>
@@ -186,7 +184,7 @@ const BodyProjects: React.FC = () => {
                     mode='single'
                     selected={tempDates.tempStartDate}
                     onSelect={(date) => handleTempDateChange('tempStartDate', date)}
-                    className='rounded-md border'
+                    className='rounded-xl border'
                   />
                 </div>
                 <div className=''>
@@ -195,7 +193,7 @@ const BodyProjects: React.FC = () => {
                     mode='single'
                     selected={tempDates.tempEndDate}
                     onSelect={(date) => handleTempDateChange('tempEndDate', date)}
-                    className='rounded-md border'
+                    className='rounded-xl border'
                   />
                 </div>
               </div>

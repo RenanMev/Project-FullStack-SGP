@@ -9,21 +9,21 @@ interface ProjectAttributes {
   data_inicio: Date;
   data_fim?: Date | null;
   status: string | null;
+  prioridade: string; // Removido 'medio' da definição da interface
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-interface ProjectCreationAttributes extends Optional<ProjectAttributes, 'id'> {}
+interface ProjectCreationAttributes extends Optional<ProjectAttributes, 'id'> { }
 
 class Project extends Model<ProjectAttributes, ProjectCreationAttributes> implements ProjectAttributes {
   public id!: number;
   public nome!: string;
   public descricao?: string;
   public data_inicio!: Date;
-  public data_fim?: Date;
-  public status!: string;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  public data_fim?: Date | null;
+  public status!: string | null;
+  public prioridade!: string;
   public readonly Usuarios?: Usuarios[];
 }
 
@@ -54,12 +54,17 @@ Project.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    prioridade: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'medio',
+    }
   },
   {
     sequelize,
     modelName: 'Project',
     tableName: 'projetos',
-    timestamps: false, 
+    timestamps: false,
   }
 );
 

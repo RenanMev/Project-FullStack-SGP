@@ -6,7 +6,7 @@ const ProtectedLayout: React.FC = () => {
   return (
     <div >
       <Sidebar />
-      <main className='flex-1 ml-60'>
+      <main className='flex-1 xl:ml-60 md:ml-0 p-2'>
         <Outlet />
       </main>
     </div>

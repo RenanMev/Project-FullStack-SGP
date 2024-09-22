@@ -7,29 +7,32 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Pencil, Users } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import { api } from '@/axiosConfig';
-import { useUser } from '@/context/UserContext';
 import { Navigate } from 'react-router-dom';
 
 const papels = ['Desenvolvedor', 'Designer', 'Gerente', 'Analista', 'QA'];
 
 const Collaborators: React.FC = () => {
   const darkMode = useTheme();
-  const { userData } = useUser();
+  
   const [collaborators, setCollaborators] = useState<{ id: number; nome: string; papel: string; email: string }[]>([]);
   const [editingCollaborator, setEditingCollaborator] = useState<{ id: number; nome: string; papel: string; email: string } | null>(null);
   const [temppapel, setTemppapel] = useState<string | undefined>(undefined);
   const [redirect, setRedirect] = useState<boolean>(false);
 
+  const userData = localStorage.getItem('userData') ? JSON.parse(localStorage.getItem('userData')!) : null;
+
   const validUser = () => {
-    api.get(`/usuarios/${userData?.id}`)
-      .then(res => {
-        if (res.data.papel !== 'Gerente') {
-          setRedirect(true);
-        }
-      })
-      .catch(error => {
-        console.error('Erro ao buscar dados do usuário:', error);
-      });
+    if (userData) {
+      api.get(`/usuarios/${userData.id}`)
+        .then(res => {
+          if (res.data.papel !== 'Gerente') {
+            setRedirect(true);
+          }
+        })
+        .catch(error => {
+          console.error('Erro ao buscar dados do usuário:', error);
+        });
+    }
   };
 
   useEffect(() => {
@@ -54,23 +57,28 @@ const Collaborators: React.FC = () => {
   }, [redirect]);
 
   const handleEdit = (collaborator: { id: number; nome: string; papel: string; email: string }) => {
+    
     setEditingCollaborator(collaborator);
     setTemppapel(collaborator.papel);
   };
 
-  const handleSave = async () => {
-    debugger
+  const handleSave = () => {
     if (editingCollaborator && temppapel) {
-      await api.put(`/edituser/${editingCollaborator.id}`,editingCollaborator )
-      .then((res)=>{
-        console.log(res)
+      api.put(`/edituser/${editingCollaborator.id}`, {
+        ...editingCollaborator,
+        papel: temppapel,
       })
-      setCollaborators(prevCollaborators =>
-        prevCollaborators.map(c =>
-          c.id === editingCollaborator.id ? { ...c, papel: temppapel } : c
-        )
-      );
-      setEditingCollaborator(null);
+      .then((res) => {
+        setCollaborators(prevCollaborators =>
+          prevCollaborators.map(c =>
+            c.id === editingCollaborator.id ? { ...c, papel: temppapel } : c
+          )
+        );
+        setEditingCollaborator(null);
+      })
+      .catch((error) => {
+        console.error('Erro ao salvar as alterações:', error);
+      });
     }
   };
 
@@ -80,7 +88,7 @@ const Collaborators: React.FC = () => {
 
   return (
     <>
-      <div className='w-full bg-neutral-950 h-screen'>
+      <div className='w-full bg-neutral-950 h-screen '>
         <Card className='w-full h-full overflow-auto'>
           <CardHeader>
             <CardTitle className='flex items-center gap-2'>
@@ -95,7 +103,7 @@ const Collaborators: React.FC = () => {
           <CardContent>
             <div className='space-y-4'>
               {collaborators.map((collaborator) => (
-                <div key={collaborator.id} className='flex justify-between items-center p-2 border rounded-md'>
+                <div key={collaborator.id} className={`flex justify-between items-center p-2 border rounded-xl ${collaborator.id === userData?.id ? 'opacity-60': ''}`}>
                   <div>
                     <p className='font-semibold'>{collaborator.nome}</p>
                     <p className='text-sm text-neutral-500'>{collaborator.papel}</p>
@@ -104,6 +112,7 @@ const Collaborators: React.FC = () => {
                   <Button
                     onClick={() => handleEdit(collaborator)}
                     variant='outline'
+                    disabled={collaborator.id === userData?.id}
                     className='flex items-center'
                     aria-label={`Editar ${collaborator.nome}`}
                   >

@@ -26,10 +26,10 @@ const chartConfig = {
 export function CharProjects() {
   const [dadosDoGrafico, setDadosDoGrafico] = useState<ProjectChart[]>([]);
 
-  useEffect(() => {
+ useEffect(() => {
     api.get<Project[]>('/projetos')
       .then(res => {
-        const contadorPorDia: Record<string, number> = {};
+        const contadorPorDia: Record<string, { count: number; userId: string }> = {};
 
         res.data.forEach((projeto: Project) => {
           const startDate = new Date(projeto.data_inicio);
@@ -40,16 +40,20 @@ export function CharProjects() {
           }
 
           const dateString = startDate.toISOString().split('T')[0];
-          contadorPorDia[dateString] = (contadorPorDia[dateString] || 0) + 1;
+          if (!contadorPorDia[dateString]) {
+            contadorPorDia[dateString] = { count: 0, userId: projeto.id.toString() };
+          }
+
+          contadorPorDia[dateString].count += 1;
         });
 
         const dadosFormatados: ProjectChart[] = Object.keys(contadorPorDia).map(dia => ({
           dia,
-          Projetos: contadorPorDia[dia]
+          Projetos: contadorPorDia[dia].count,
+          userId: contadorPorDia[dia].userId,
         }));
 
         setDadosDoGrafico(dadosFormatados);
-
       })
       .catch(error => {
         console.error('Erro ao buscar dados:', error);

@@ -126,11 +126,12 @@ const RegisterPage = () => {
   ]
 
   return (
-    <div className="h-screen w-screen flex justify-center items-center bg-neutral-50 dark:bg-neutral-950">
+    <div className="h-screen w-screen flex justify-center items-center ">
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        transition={{ duration: 0.3 }}
       >
         <Card className="mx-auto max-w-sm">
           <CardHeader>

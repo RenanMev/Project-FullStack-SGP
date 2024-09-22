@@ -18,8 +18,26 @@ export const ListAllProjects = async (req: Request, res: Response): Promise<Resp
   }
 };
 
+export const getProjects = async (req: Request, res: Response): Promise<Response> => {
+  const { id } = req.params;
+
+  try {
+    const projeto = await Projeto.findByPk(id);
+
+    if (!projeto) {
+      return res.status(404).json({ error: 'Projeto não encontrado.' });
+    }
+
+    return res.status(200).json(projeto);
+  } catch (error) {
+    console.error('Erro ao buscar projeto:', error);
+    return res.status(500).json({ error: 'Erro ao buscar projeto.', msg: (error as Error).message });
+  }
+};
+
+
 export const registerProjects = async (req: Request, res: Response): Promise<Response> => {
-  const { nome, descricao, data_inicio, data_fim, status } = req.body;
+  const { nome, descricao, data_inicio, data_fim, status, prioridade } = req.body;
 
   try {
     if (!nome || !data_inicio || !status) {
@@ -31,7 +49,8 @@ export const registerProjects = async (req: Request, res: Response): Promise<Res
       descricao,
       data_inicio,
       status,
-      data_fim
+      data_fim,
+      prioridade
     });
 
     return res.status(201).json(novoProjeto);
@@ -42,8 +61,8 @@ export const registerProjects = async (req: Request, res: Response): Promise<Res
 };
 
 export const editProjects = async (req: Request, res: Response): Promise<Response> => {
-  const id = parseInt(req.params.userId);
-  const { nome, descricao, data_inicio, data_fim, status } = req.body;
+  const id = parseInt(req.params.id);
+  const { nome, descricao, data_inicio, data_fim, status, prioridade } = req.body;
 
   if (isNaN(id)) {
     return res.status(400).json({ error: 'ID inválido.' });
@@ -64,6 +83,7 @@ export const editProjects = async (req: Request, res: Response): Promise<Respons
     projeto.data_inicio = data_inicio;
     projeto.data_fim = data_fim;
     projeto.status = status;
+    projeto.prioridade = prioridade;
 
     await projeto.save();
 
@@ -186,7 +206,7 @@ export const removeUserFromProject = async (req: Request, res: Response): Promis
 
     await projetoUsuario.destroy();
 
-    return res.status(204).send(); 
+    return res.status(204).send();
   } catch (error) {
     console.error('Erro ao remover usuário do projeto:', error);
     return res.status(500).json({ erro: 'Erro ao remover usuário do projeto.' });
@@ -224,5 +244,30 @@ export const getUserProjects = async (req: Request, res: Response): Promise<Resp
 };
 
 
+export const updateStatusProjects = async (req: Request, res: Response) => {
+  const { projetoId } = req.params;
+  console.log
+  const { status } = req.body
 
+  try {
+    const projeto = await Projeto.findByPk(projetoId);
+    if (!projeto) {
+      return res.status(404).json({ error: 'Projeto não encontrado.' });
+    }
+
+    if (!status) {
+      return res.status(400).json({ error: 'Status não informado .' });
+    }
+
+    projeto.status = status;
+
+    await projeto.save();
+
+    return res.status(200).json(projeto);
+  }
+  catch (error) {
+    console.error('Erro ao atualizar o status do projeto:', error);
+    return res.status(500).json({ error: 'Erro ao atualizar o status do projeto.', msg: (error as Error).message });
+  }
+}
 

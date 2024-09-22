@@ -10,6 +10,7 @@ import CreateProjects from '@/pages/CreateProjects/CreateProjects';
 import Collaborators from '@/pages/Collaborators/Collaborators';
 import RouteAuth from './RouteAuth';
 import Dashboard from '@/pages/Dashboard/Dashboard';
+import EditProject from '@/pages/Projects/EditProject';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -26,6 +27,7 @@ const AppRoutes: React.FC = () => {
             <Route path="/projects" element={<ProjectsList />} />
             <Route path="/createProjects" element={<CreateProjects />} />
             <Route path="/collaborators" element={<Collaborators />} />
+            <Route path="/projects/:id" element={<EditProject/>} />
           </Route>
         </Route>
 

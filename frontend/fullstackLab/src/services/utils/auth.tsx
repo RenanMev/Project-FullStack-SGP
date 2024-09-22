@@ -5,4 +5,5 @@ export const isAuthenticated = () => {
 export const LogoutIsAcout = () => {
   localStorage.removeItem('user');
   localStorage.removeItem('sessionToken');
+  localStorage.removeItem('userData');
 };

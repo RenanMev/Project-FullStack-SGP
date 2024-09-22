@@ -25,6 +25,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (userId) {
         await api.get(`/usuarios/${userId}`).then((res) => {
           setUserData(res.data);
+          localStorage.setItem('userData', JSON.stringify(res.data));
         }).catch((err) => {
           console.warn('Erro ao buscar dados do usuário:', err);
         })

@@ -91,7 +91,8 @@ export const addFileProjects = (req: Request, res: Response): void => {
               descricao: project.descricao as string | undefined,
               data_inicio: project.data_inicio as Date, 
               data_fim: project.data_fim as Date | undefined, 
-              status: project.status as string | undefined
+              status: project.status as string | undefined,
+              prioridade: project.prioridade as string ,
             });
           }
 

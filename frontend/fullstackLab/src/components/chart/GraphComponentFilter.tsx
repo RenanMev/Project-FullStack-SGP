@@ -20,8 +20,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { api } from '@/axiosConfig';
 import { Project, ProjectChart } from '@/types/projectsTypes';
+import { api } from "@/axiosConfig";
 
 const chartConfig = {
   projects: {
@@ -30,86 +30,60 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export const GraphComponentFilter = () => {
-  const [allProjects, setAllProjects] = useState<ProjectChart[]>([]);
-  const [userProjects, setUserProjects] = useState<ProjectChart[]>([]);
-  const [selectedUser, setSelectedUser] = useState<string | undefined>(undefined);
+interface GraphComponentFilterProps {
+  projects: Project[];
+  users: { id: string; nome: string }[];
+}
+
+export const GraphComponentFilter: React.FC<GraphComponentFilterProps> = ({ projects, users }) => {
   const [filteredData, setFilteredData] = useState<ProjectChart[]>([]);
-  const [users, setUsers] = useState<any[]>([]);
+  const [selectedUser, setSelectedUser] = useState<string | undefined>(undefined);
 
-  useEffect(() => {
-    api.get('/usuarios')
-      .then(res => {
-        setUsers(res.data); 
-      })
-      .catch(error => {
-        console.error('Erro ao buscar usuários:', error);
+  const formatData = (projects: Project[]) => {
+    const countForDay: Record<string, { count: number; userId: string }> = {};
+
+    projects.forEach((projeto: Project) => {
+      const endDate = new Date(projeto.data_fim);
+
+      if (isNaN(endDate.getTime())) {
+        console.warn(`Data de fim inválida para o projeto ${projeto.id}: ${projeto.data_fim}`);
+        return;
+      }
+
+      const dateString = endDate.toISOString().split('T')[0];
+      if (!countForDay[dateString]) {
+        countForDay[dateString] = { count: 0, userId: selectedUser || '' };
+      }
+
+      countForDay[dateString].count += 1;
+    });
+
+    return Object.keys(countForDay).map(dia => ({
+      dia,
+      Projetos: countForDay[dia].count,
+      userId: countForDay[dia].userId,
+    }));
+  };
+
+  const getDataForFilter = async (idUser: string) => {
+    return api.get(`/projetos/${idUser}/projetos`)
+      .then(res => formatData(res.data))
+      .catch(err => {
+        console.log(err)
+        return [];
       });
-  }, []);
+  };
 
   useEffect(() => {
-    api.get<Project[]>('/projetos')
-      .then(res => {
-        const contadorPorDia: Record<string, number> = {};
-
-        res.data.forEach((projeto: Project) => {
-          const endDate = new Date(projeto.data_fim);
-
-          if (isNaN(endDate.getTime())) {
-            console.warn(`Data de fim inválida para o projeto ${projeto.id}: ${projeto.data_fim}`);
-            return;
-          }
-
-          const dateString = endDate.toISOString().split('T')[0];
-          contadorPorDia[dateString] = (contadorPorDia[dateString] || 0) + 1;
-        });
-
-        const dadosFormatados: ProjectChart[] = Object.keys(contadorPorDia).map(dia => ({
-          dia,
-          Projetos: contadorPorDia[dia],
-        }));
-
-        setAllProjects(dadosFormatados);
-      })
-      .catch(error => {
-        console.error('Erro ao buscar dados de todos os projetos:', error);
+    if (!selectedUser) {
+      setFilteredData(formatData(projects));
+    } else {
+      getDataForFilter(selectedUser)
+      .then(data => {
+        setFilteredData(data);
       });
-  }, []);
-
-  useEffect(() => {
-    if (!selectedUser) return; 
-
-    api.get<Project[]>(`/projetos/${selectedUser}`)
-      .then(res => {
-        const contadorPorDia: Record<string, number> = {};
-
-        res.data.forEach((projeto: Project) => {
-          const endDate = new Date(projeto.data_fim);
-
-          if (isNaN(endDate.getTime())) {
-            console.warn(`Data de fim inválida para o projeto ${projeto.id}: ${projeto.data_fim}`);
-            return;
-          }
-
-          const dateString = endDate.toISOString().split('T')[0];
-          contadorPorDia[dateString] = (contadorPorDia[dateString] || 0) + 1;
-        });
-
-        const dadosFormatados: ProjectChart[] = Object.keys(contadorPorDia).map(dia => ({
-          dia,
-          Projetos: contadorPorDia[dia],
-        }));
-
-        setUserProjects(dadosFormatados);
-      })
-      .catch(error => {
-        console.error('Erro ao buscar projetos do usuário:', error);
-      });
-  }, [selectedUser]);
-
-  useEffect(() => {
-    setFilteredData(selectedUser ? userProjects : allProjects);
-  }, [selectedUser, allProjects, userProjects]);
+    }
+  }, [selectedUser, projects]);
 
   return (
     <Card>
@@ -120,22 +94,22 @@ export const GraphComponentFilter = () => {
             Mostrando a quantidade de projetos por data de fim
           </CardDescription>
         </div>
-        <Select 
-          value={selectedUser} 
+        <Select
+          value={selectedUser}
           onValueChange={(value) => setSelectedUser(value === 'Todos os usuários' ? undefined : value)}
         >
           <SelectTrigger
-            className="w-[160px] rounded-lg sm:ml-auto"
+            className="w-[160px] rounded-xl sm:ml-auto"
             aria-label="Selecione um usuário"
           >
             <SelectValue placeholder="Todos os usuários" />
           </SelectTrigger>
           <SelectContent className="rounded-xl">
-            <SelectItem value={'Todos os usuários'} className="rounded-lg">
+            <SelectItem value={'Todos os usuários'} className="rounded-xl">
               Todos os usuários
             </SelectItem>
             {users.map((user) => (
-              <SelectItem key={user.id} value={user.id} className="rounded-lg">
+              <SelectItem key={user.id} value={user.id} className="rounded-xl">
                 {user.nome}
               </SelectItem>
             ))}
@@ -179,11 +153,11 @@ export const GraphComponentFilter = () => {
             />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent indicator="dot" />} 
+              content={<ChartTooltipContent indicator="dot" />}
             />
             <Area
               dataKey="Projetos"
-              type="monotone" 
+              type="monotone"
               fill="url(#fillProjects)"
               stroke="var(--color-projects)"
               strokeWidth={2}

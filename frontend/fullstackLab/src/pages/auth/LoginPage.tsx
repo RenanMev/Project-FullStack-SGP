@@ -71,7 +71,7 @@ const LoginPage = () => {
           localStorage.setItem("sessionToken", sessionToken);
           localStorage.setItem("user", user);
 
-          navigate('/main');
+          navigate('/dashboard');
         }
       }).catch((err) => {
 
@@ -103,7 +103,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="h-screen w-screen flex justify-center items-center bg-neutral-50 dark:bg-neutral-950">
+    <div className="h-screen w-screen flex justify-center items-center ">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}

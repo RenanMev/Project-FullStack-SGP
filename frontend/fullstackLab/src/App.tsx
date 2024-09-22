@@ -1,4 +1,3 @@
-import React, { useEffect } from 'react';
 import { ThemeProvider } from "./context/ThemeContext";
 import AppRoutes from "./routes";
 import { UserProvider } from './context/UserContext';
@@ -6,7 +5,7 @@ import { UserProvider } from './context/UserContext';
 const App = () => {
 
   return (
-    <ThemeProvider>
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <UserProvider>
         <AppRoutes />
       </UserProvider>
