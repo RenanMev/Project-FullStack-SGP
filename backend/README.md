@@ -1,4 +1,3 @@
-```markdown
 # Documentação da API: Projetos
 
 ## Endpoints
@@ -181,4 +180,108 @@ Atualiza o status de um projeto.
 - `400 Bad Request`: Status não informado.
 
 ---
+
+### 11. Adicionar Projetos via Upload de CSV
+**`POST /api/projetos/upload`**
+
+Permite o upload de um arquivo CSV para cadastrar ou atualizar projetos.
+
+**Requisitos:**
+- O arquivo deve ser do tipo `text/csv` ou `application/vnd.ms-excel`.
+
+**Respostas:**
+- `200 OK`: Arquivo processado e projetos atualizados.
+- `400 Bad Request`: Erro no upload ou arquivo inválido.
+- `500 Internal Server Error`: Erro ao processar o arquivo CSV.
+
+---
+
+### 12. Registrar Usuário
+**`POST /api/usuarios/register`**
+
+Cadastra um novo usuário.
+
+**Corpo da Requisição:**
+```json
+{
+  "nome": "string",
+  "email": "string",
+  "senha": "string",
+  "papel": "string"
+}
 ```
+
+**Respostas:**
+- `201 Created`: Usuário registrado com sucesso.
+- `500 Internal Server Error`: Erro ao registrar usuário.
+
+---
+
+### 13. Login de Usuário
+**`POST /api/usuarios/login`**
+
+Realiza o login de um usuário.
+
+**Corpo da Requisição:**
+```json
+{
+  "email": "string",
+  "senha": "string"
+}
+```
+
+**Respostas:**
+- `200 OK`: Usuário autenticado com sucesso.
+- `401 Unauthorized`: Email ou senha inválidos.
+- `500 Internal Server Error`: Erro ao autenticar.
+
+---
+
+### 14. Listar Todos os Usuários
+**`GET /api/usuarios`**
+
+Retorna todos os usuários cadastrados.
+
+**Respostas:**
+- `200 OK`: Lista de usuários.
+- `500 Internal Server Error`: Erro ao listar usuários.
+
+---
+
+### 15. Editar Usuário
+**`PUT /api/usuarios/:userId`**
+
+Edita as informações de um usuário.
+
+**Parâmetros:**
+- `userId`: Identificador do usuário.
+
+**Corpo da Requisição:**
+```json
+{
+  "nome": "string",
+  "email": "string",
+  "papel": "string"
+}
+```
+
+**Respostas:**
+- `200 OK`: Usuário atualizado.
+- `404 Not Found`: Usuário não encontrado.
+- `500 Internal Server Error`: Erro ao editar usuário.
+
+---
+
+### 16. Obter Usuário por ID
+**`GET /api/usuarios/:userId`**
+
+Retorna um usuário específico com base no ID.
+
+**Parâmetros:**
+- `userId`: Identificador do usuário.
+
+**Respostas:**
+- `200 OK`: Detalhes do usuário.
+- `404 Not Found`: Usuário não encontrado.
+- `500 Internal Server Error`: Erro ao buscar usuário.
+
