@@ -64,9 +64,8 @@ const Sidebar: React.FC = () => {
             Criar Projeto
           </Link>
           <Link
-            to={userData?.papel === 'Gerente' ? "/collaborators" : "#"}
-            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 transition-all ${userData?.papel === 'Gerente' ? (isActive('/collaborators') ? 'bg-popover text-primary' : 'text-muted-foreground') : 'text-neutral-500 cursor-not-allowed'}`}
-            aria-disabled={userData?.papel !== 'Gerente'}
+            to={"/collaborators"}
+            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 transition-all hover:text-primary ${isActive('/collaborators') ? 'bg-popover text-primary' : 'text-muted-foreground'}`}
           >
             <Users className="h-6 w-6" />
             Colaboradores

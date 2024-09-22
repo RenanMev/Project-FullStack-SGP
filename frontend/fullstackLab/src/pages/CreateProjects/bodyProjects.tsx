@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,6 @@ import { api } from '@/axiosConfig';
 import Notification from '@/components/ui/notification';
 
 const BodyProjects: React.FC = () => {
-  const [people, setPeople] = useState<{ id: number; nome: string; papel: string; email: string }[]>([]);
   const [openNotification, setOpenNotification] = useState<boolean>(false);
   const [titleNotification, setTitleNotification] = useState<string>('');
   const [descriptionNotification, setDescriptionNotification] = useState<string>('');
@@ -113,19 +112,7 @@ const BodyProjects: React.FC = () => {
     handleChange('dialogCalendar', false);
   };
 
-  useEffect(() => {
-    const fetchCollaborators = () => {
-      api.get('/usuarios')
-        .then((res) => {
-          setPeople(res.data);
-        })
-        .catch((err) => {
-          console.error('Erro ao buscar colaboradores:', err);
-        });
-    };
-
-    fetchCollaborators();
-  }, []);
+ 
   return (
     <>
       <Card className='flex-1 overflow-hidden'>

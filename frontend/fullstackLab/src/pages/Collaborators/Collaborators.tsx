@@ -7,17 +7,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Pencil, Users } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import { api } from '@/axiosConfig';
-import { Navigate } from 'react-router-dom';
 
 const papels = ['Desenvolvedor', 'Designer', 'Gerente', 'Analista', 'QA'];
 
 const Collaborators: React.FC = () => {
   const darkMode = useTheme();
-  
+
   const [collaborators, setCollaborators] = useState<{ id: number; nome: string; papel: string; email: string }[]>([]);
   const [editingCollaborator, setEditingCollaborator] = useState<{ id: number; nome: string; papel: string; email: string } | null>(null);
   const [temppapel, setTemppapel] = useState<string | undefined>(undefined);
-  const [redirect, setRedirect] = useState<boolean>(false);
+  const [disabledPerm, setDisabledPerm] = useState<boolean>(false);
+  const [user, setUser] = useState<any>(false);
 
   const userData = localStorage.getItem('userData') ? JSON.parse(localStorage.getItem('userData')!) : null;
 
@@ -26,7 +26,8 @@ const Collaborators: React.FC = () => {
       api.get(`/usuarios/${userData.id}`)
         .then(res => {
           if (res.data.papel !== 'Gerente') {
-            setRedirect(true);
+            setDisabledPerm(true)
+            setUser(res.data)
           }
         })
         .catch(error => {
@@ -42,7 +43,6 @@ const Collaborators: React.FC = () => {
   }, [userData]);
 
   useEffect(() => {
-    if (redirect) return;
     const fetchCollaborators = () => {
       api.get('/usuarios')
         .then(res => {
@@ -54,10 +54,10 @@ const Collaborators: React.FC = () => {
     };
 
     fetchCollaborators();
-  }, [redirect]);
+  }, []);
 
   const handleEdit = (collaborator: { id: number; nome: string; papel: string; email: string }) => {
-    
+
     setEditingCollaborator(collaborator);
     setTemppapel(collaborator.papel);
   };
@@ -68,23 +68,21 @@ const Collaborators: React.FC = () => {
         ...editingCollaborator,
         papel: temppapel,
       })
-      .then((res) => {
-        setCollaborators(prevCollaborators =>
-          prevCollaborators.map(c =>
-            c.id === editingCollaborator.id ? { ...c, papel: temppapel } : c
-          )
-        );
-        setEditingCollaborator(null);
-      })
-      .catch((error) => {
-        console.error('Erro ao salvar as alterações:', error);
-      });
+        .then(() => {
+          setCollaborators(prevCollaborators =>
+            prevCollaborators.map(c =>
+              c.id === editingCollaborator.id ? { ...c, papel: temppapel } : c
+            )
+          );
+          setEditingCollaborator(null);
+        })
+        .catch((error) => {
+          console.error('Erro ao salvar as alterações:', error);
+        });
     }
   };
 
-  if (redirect) {
-    return <Navigate to="/" replace />;
-  }
+
 
   return (
     <>
@@ -103,7 +101,7 @@ const Collaborators: React.FC = () => {
           <CardContent>
             <div className='space-y-4'>
               {collaborators.map((collaborator) => (
-                <div key={collaborator.id} className={`flex justify-between items-center p-2 border rounded-xl ${collaborator.id === userData?.id ? 'opacity-60': ''}`}>
+                <div key={collaborator.id} className={`flex justify-between items-center p-2 border rounded-xl ${disabledPerm && collaborator.id !== user.id ? 'opacity-60' : ''}`}>
                   <div>
                     <p className='font-semibold'>{collaborator.nome}</p>
                     <p className='text-sm text-neutral-500'>{collaborator.papel}</p>
@@ -112,7 +110,7 @@ const Collaborators: React.FC = () => {
                   <Button
                     onClick={() => handleEdit(collaborator)}
                     variant='outline'
-                    disabled={collaborator.id === userData?.id}
+                    disabled={disabledPerm && collaborator.id !== user.id }
                     className='flex items-center'
                     aria-label={`Editar ${collaborator.nome}`}
                   >
@@ -142,6 +140,7 @@ const Collaborators: React.FC = () => {
               <div >
                 <p className='pt-2 mb-3'>Cargo</p>
                 <Select
+                  disabled={disabledPerm}
                   onValueChange={(value) => setTemppapel(value)}
                   value={temppapel}
                   aria-label='Selecione o cargo'
@@ -160,7 +159,7 @@ const Collaborators: React.FC = () => {
               </div>
               <div className='pb-6'>
                 <p className='pt-2 mb-3'>Email</p>
-                <Input disabled={userData?.papel === 'Gerente' ? false : true} value={editingCollaborator?.email} readOnly />
+                <Input disabled={disabledPerm} value={editingCollaborator?.email} readOnly />
               </div>
               <div className='flex justify-end gap-4'>
                 <Button
