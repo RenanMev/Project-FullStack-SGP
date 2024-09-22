@@ -151,16 +151,14 @@ const LoginPage = () => {
                   </motion.p>
                 )}
               </div>
-              <div className="grid gap-2">
+              <div className="grid gap-2 mt-5">
                 <div className="flex items-center">
                   <Label htmlFor="senha">Senha</Label>
-                  <Link to="/" className="ml-auto inline-block text-sm underline">
-                    Esqueceu sua senha?
-                  </Link>
                 </div>
                 <Input
                   id="senha"
                   type="password"
+                  placeholder="*********"
                   value={formValue.senha}
                   onChange={handleValueForm}
                   required
