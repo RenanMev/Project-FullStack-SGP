@@ -1,4 +1,3 @@
-```markdown
 # Documentação da API: Projetos
 
 ## Endpoints
