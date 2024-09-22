@@ -18,6 +18,7 @@ export const ListAllProjects = async (req: Request, res: Response): Promise<Resp
   }
 };
 
+
 export const getProjects = async (req: Request, res: Response): Promise<Response> => {
   const { id } = req.params;
 
@@ -62,10 +63,15 @@ export const registerProjects = async (req: Request, res: Response): Promise<Res
 
 export const editProjects = async (req: Request, res: Response): Promise<Response> => {
   const id = parseInt(req.params.id);
+  console.log(id)
   const { nome, descricao, data_inicio, data_fim, status, prioridade } = req.body;
 
   if (isNaN(id)) {
     return res.status(400).json({ error: 'ID inválido.' });
+  }
+
+  if(!prioridade){
+    return res.status(400).json({ error: 'Prioridade não foi informado' });
   }
 
   try {

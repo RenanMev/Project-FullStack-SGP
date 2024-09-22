@@ -52,11 +52,5 @@ Projeto.belongsToMany(User, {
   otherKey: 'usuario_id',
 });
 
-User.belongsToMany(Projeto, {
-  through: ProjetosUsuarios,
-  as: 'Projetos',
-  foreignKey: 'usuario_id',
-  otherKey: 'projeto_id',
-});
 
 export default ProjetosUsuarios;
