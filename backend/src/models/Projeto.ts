@@ -9,7 +9,7 @@ interface ProjectAttributes {
   data_inicio: Date;
   data_fim?: Date | null;
   status: string | null;
-  prioridade: string; // Removido 'medio' da definição da interface
+  prioridade: string; 
   createdAt?: Date;
   updatedAt?: Date;
 }

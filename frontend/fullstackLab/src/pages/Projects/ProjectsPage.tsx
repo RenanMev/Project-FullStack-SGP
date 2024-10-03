@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ChartNoAxesGantt, CloudUpload } from 'lucide-react';
+import ProjectCards from './ProjectCards';
 
 export default function ProjectsList() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -22,6 +23,7 @@ export default function ProjectsList() {
   const [openNotification, setOpenNotification] = useState(false);
   const [titleAlert, setTitleAlert] = useState('');
   const [messageAlert, setMessageAlert] = useState('');
+  const [viewProjectsTable, setViewProjectsTable] = useState(true); // Alterado para 'true' como padrão.
 
   const itemsPerPage = 6;
   const navigate = useNavigate();
@@ -60,11 +62,6 @@ export default function ProjectsList() {
     if (page >= 1 && page <= Math.ceil(filteredProjects.length / itemsPerPage)) {
       setCurrentPage(page);
     }
-  };
-
-  const handleSearchChange = (value: string) => {
-    setSearchTerm(value);
-    setCurrentPage(1);
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -106,6 +103,10 @@ export default function ProjectsList() {
       });
   };
 
+  const changeViewProjects = (value: boolean) => {
+    setViewProjectsTable(value);
+  };
+
   return (
     <section className="h-full w-full p-6 min-h-screen">
       {loading && (
@@ -113,17 +114,13 @@ export default function ProjectsList() {
           <LoadingIndicator />
         </div>
       )}
-      <div className='flex-col items-center mb-10 '>
+      <div className='flex-col items-center mb-10'>
         <div className='flex items-center mb-6 gap-2'>
           <div>
             <ChartNoAxesGantt />
           </div>
           <h1 className="font-bold text-3xl">Projetos</h1>
         </div>
-
-        {/* <div>
-          <ProjectsSearch searchTerm={searchTerm} onSearchChange={handleSearchChange} />
-        </div> */}
 
         <div className='flex mt-5 gap-9 h-10'>
           <Dialog>
@@ -166,13 +163,35 @@ export default function ProjectsList() {
         </div>
       </div>
 
-      <ProjectsTable projects={currentProjects} onEditClick={handleEditClick} />
-      <ProjectsPagination
-        currentPage={currentPage}
-        totalItems={filteredProjects.length}
-        itemsPerPage={itemsPerPage}
-        onPageChange={handlePageChange}
-      />
+      <div className='flex pb-5'>
+        <div className='flex gap-2 pl-2'>
+          <Button variant={"outline"} onClick={() => changeViewProjects(true)}>
+            Tabela
+          </Button>
+          <Button variant={"outline"} onClick={() => changeViewProjects(false)}>
+            Cards
+          </Button>
+        </div>
+      </div>
+
+      {viewProjectsTable && (
+        <>
+          <ProjectsTable projects={currentProjects} onEditClick={handleEditClick} />
+          <ProjectsPagination
+            currentPage={currentPage}
+            totalItems={filteredProjects.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={handlePageChange}
+          />
+        </>
+      )}
+      {!viewProjectsTable && (
+        <>
+          <ProjectCards/>
+        </>
+      )}
+
+
 
       {openNotification && (
         <Notification

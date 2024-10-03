@@ -63,6 +63,7 @@ const LoginPage = () => {
       setPasswordError('A senha deve ter pelo menos 8 dígitos');
     }
 
+    navigate('/dashboard');
     if (isValidEmail && isValidPassword) {
       apiAuth.post('/login', formValue).then((res) => {
         if (res.status === 200) {
@@ -71,7 +72,7 @@ const LoginPage = () => {
           localStorage.setItem("sessionToken", sessionToken);
           localStorage.setItem("user", user);
 
-          navigate('/dashboard');
+   
         }
       }).catch((err) => {
 

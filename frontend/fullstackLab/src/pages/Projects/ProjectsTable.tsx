@@ -144,6 +144,7 @@ export default function ProjectsTable({ projects, onEditClick }: ProjectsTablePr
 
   return (
     <Card className='p-9'>
+     
       <div className="flex items-center py-4">
         <Input
           placeholder="Filtrar projetos..."
@@ -168,9 +169,9 @@ export default function ProjectsTable({ projects, onEditClick }: ProjectsTablePr
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
                   </TableHead>
                 )
               })}

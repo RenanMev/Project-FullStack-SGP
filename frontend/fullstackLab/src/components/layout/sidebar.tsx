@@ -5,14 +5,24 @@ import {
   ChartNoAxesGantt,
   Users,
   LayoutDashboard,
+  LogOut,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
 import { Button } from '../ui/button';
 import { LogoutIsAcout } from '@/services/utils/auth';
 import { useUser } from '@/context/UserContext';
 import { ModeToggle } from '../toogleDarkmode';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
-const Sidebar: React.FC = () => {
+// Definição das props do Sidebar
+interface SidebarProps {
+  isMinimized: boolean;
+  toggleMinimize: () => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ isMinimized, toggleMinimize }) => {
   const { userData } = useUser();
   const navigate = useNavigate();
   const location = useLocation();
@@ -28,55 +38,84 @@ const Sidebar: React.FC = () => {
     navigate('/');
   };
 
+  const navItems = [
+    { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+    { path: '/projects', icon: ChartNoAxesGantt, label: 'Projetos' },
+    { path: '/createProjects', icon: CircleFadingPlus, label: 'Criar Projeto' },
+    { path: '/collaborators', icon: Users, label: 'Colaboradores' },
+  ];
+
   return (
-    <div className="flex-col fixed gap-0 h-screen w-60 border-r-2 xl:flex lg:hidden md:hidden sm:hidden flex bg-card">
-      <div className='flex items-center px-4 w-full my-4 justify-around'>
-        <Avatar className='rounded-full pointer'>
-          <AvatarImage className='rounded-full w-10 cursor-pointer hover:border-2 border-white' src="https://github.com/shadcn.png" alt="@shadcn" />
-          <AvatarFallback>CN</AvatarFallback>
-        </Avatar>
-        <div className=' font-medium'>
-          {userData ? userData.nome : ''}
+    <div className={`flex flex-col fixed h-screen border-r border-border bg-card shadow-lg transition-all duration-300 ${isMinimized ? 'w-20' : 'w-64'}`}>
+      <div className={`flex items-center justify-between px-4 py-4 border-b border-border ${isMinimized ? 'flex-col' : ''}`}>
+        <div className={`flex items-center ${isMinimized ? 'flex-col' : 'space-x-3'}`}>
+          <Avatar className='rounded-full'>
+            <AvatarImage className='rounded-full w-10 h-10 object-cover' src="https://github.com/shadcn.png" alt="@shadcn" />
+            <AvatarFallback>CN</AvatarFallback>
+          </Avatar>
+          {!isMinimized && (
+            <div className='font-semibold truncate'>
+              {userData ? userData.nome : 'User'}
+            </div>
+          )}
         </div>
-        <ModeToggle />
+        {!isMinimized && <ModeToggle />}
       </div>
-      <div className='flex flex-col h-full py-6'>
-        <nav className="flex-col flex h-full items-start px-2 text-sm font-medium lg:px-4 gap-3">
-          <Link
-            to="/dashboard"
-            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 transition-all hover:text-primary ${isActive('/dashboard') ? 'bg-popover text-primary' : 'text-muted-foreground'}`}
-          >
-            <LayoutDashboard className="h-6 w-6" />
-            Dashboard
-          </Link>
-          <Link
-            to="/projects"
-            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 transition-all hover:text-primary ${isActive('/projects') ? 'bg-popover text-primary' : 'text-muted-foreground'}`}
-          >
-            <ChartNoAxesGantt className="h-6 w-6" />
-            Projetos
-          </Link>
-          <Link
-            to="/createProjects"
-            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 transition-all hover:text-primary ${isActive('/createProjects') ? 'bg-popover text-primary' : 'text-muted-foreground'}`}
-          >
-            <CircleFadingPlus className="h-6 w-6" />
-            Criar Projeto
-          </Link>
-          <Link
-            to={"/collaborators"}
-            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 transition-all hover:text-primary ${isActive('/collaborators') ? 'bg-popover text-primary' : 'text-muted-foreground'}`}
-          >
-            <Users className="h-6 w-6" />
-            Colaboradores
-          </Link>
-        </nav>
-        <div className='px-4' onClick={handleLogout}>
-          <Button className='w-full rounded-xl'>
-            Sair
-          </Button>
-        </div>
+      <nav className="flex-grow py-6 px-2">
+        <ul className="space-y-2">
+          {navItems.map(({ path, icon: Icon, label }) => (
+            <li key={path}>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link
+                      to={path}
+                      className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-all ${
+                        isActive(path)
+                          ? 'bg-primary/10 text-primary font-medium'
+                          : 'text-muted-foreground hover:bg-primary/5 hover:text-primary'
+                      } ${isMinimized ? 'justify-center' : ''}`}
+                    >
+                      <Icon className="h-5 w-5 flex-shrink-0" />
+                      {!isMinimized && <span>{label}</span>}
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" sideOffset={10}>
+                    {label}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <div className='px-2 pb-6'>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                className={`w-full justify-start text-muted-foreground hover:text-primary ${isMinimized ? 'px-2' : ''}`}
+                onClick={handleLogout}
+              >
+                <LogOut className="h-5 w-5" />
+                {!isMinimized && <span className="ml-2">Sair</span>}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right" sideOffset={10}>
+              Sair
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute top-1/2 -right-4 transform -translate-y-1/2 bg-card border border-border rounded-full shadow-md"
+        onClick={toggleMinimize}
+      >
+        {isMinimized ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+      </Button>
     </div>
   );
 };
